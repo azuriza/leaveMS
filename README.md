@@ -8,7 +8,7 @@ This is a full-stack application for managing and applying leave on an organizat
 ### clone this project into your machine
 
 ```bash
-git clone https://github.com/ronald-kimeli/leave-management-system.git
+git clone https://github.com/azuriza/leaveMS.git
 ```
 
 ### Install project dependencies

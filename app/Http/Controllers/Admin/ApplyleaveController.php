@@ -87,7 +87,7 @@ class ApplyleaveController extends Controller
         $data->leave_to = $request->input('leave_to');
         $data->save();
 
-        return redirect('/')->with(['status' => 'Leave Applied Successfully. You have 2 days to update your application', 'status_code' => 'success']);
+        return redirect('add/applyleave')->with(['status' => 'Leave Applied Successfully. You have 2 days to update your application', 'status_code' => 'success']);
     }
 
     /**

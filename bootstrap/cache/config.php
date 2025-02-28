@@ -10,7 +10,7 @@
     'locale' => 'en',
     'fallback_locale' => 'en',
     'faker_locale' => 'en_US',
-    'key' => 'base64:fAFStqXMRwZ6Nm4RrmH4JB1nw1uAPqDARN14ZsspqAE=',
+    'key' => 'base64:1cMY8FrKf4xw15/Bi+OOuyXICiQL5n9u/9njLV9H9bc=',
     'cipher' => 'AES-256-CBC',
     'providers' => 
     array (
@@ -184,7 +184,7 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => 'D:\\PROJECT\\leave-management-system\\storage\\framework/cache/data',
+        'path' => 'D:\\PROJECT\\leaveMS\\storage\\framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -355,12 +355,12 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => 'D:\\PROJECT\\leave-management-system\\storage\\app',
+        'root' => 'D:\\PROJECT\\leaveMS\\storage\\app',
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => 'D:\\PROJECT\\leave-management-system\\storage\\app/public',
+        'root' => 'D:\\PROJECT\\leaveMS\\storage\\app/public',
         'url' => 'http://localhost/storage',
         'visibility' => 'public',
       ),
@@ -378,7 +378,7 @@
     ),
     'links' => 
     array (
-      'D:\\PROJECT\\leave-management-system\\public\\storage' => 'D:\\PROJECT\\leave-management-system\\storage\\app/public',
+      'D:\\PROJECT\\leaveMS\\public\\storage' => 'D:\\PROJECT\\leaveMS\\storage\\app/public',
     ),
   ),
   'hashing' => 
@@ -413,13 +413,13 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => 'D:\\PROJECT\\leave-management-system\\storage\\logs/laravel.log',
+        'path' => 'D:\\PROJECT\\leaveMS\\storage\\logs/laravel.log',
         'level' => 'debug',
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => 'D:\\PROJECT\\leave-management-system\\storage\\logs/laravel.log',
+        'path' => 'D:\\PROJECT\\leaveMS\\storage\\logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
       ),
@@ -470,7 +470,7 @@
       ),
       'emergency' => 
       array (
-        'path' => 'D:\\PROJECT\\leave-management-system\\storage\\logs/laravel.log',
+        'path' => 'D:\\PROJECT\\leaveMS\\storage\\logs/laravel.log',
       ),
     ),
   ),
@@ -536,7 +536,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => 'D:\\PROJECT\\leave-management-system\\resources\\views/vendor/mail',
+        0 => 'D:\\PROJECT\\leaveMS\\resources\\views/vendor/mail',
       ),
     ),
   ),
@@ -641,7 +641,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => 'D:\\PROJECT\\leave-management-system\\storage\\framework/sessions',
+    'files' => 'D:\\PROJECT\\leaveMS\\storage\\framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -661,9 +661,9 @@
   array (
     'paths' => 
     array (
-      0 => 'D:\\PROJECT\\leave-management-system\\resources\\views',
+      0 => 'D:\\PROJECT\\leaveMS\\resources\\views',
     ),
-    'compiled' => 'D:\\PROJECT\\leave-management-system\\storage\\framework\\views',
+    'compiled' => 'D:\\PROJECT\\leaveMS\\storage\\framework\\views',
   ),
   'flare' => 
   array (

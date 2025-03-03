@@ -9,13 +9,13 @@
 
     <!-- Navbar Search-->
     <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-        <div class="input-group">
+        <!-- <div class="input-group">
             <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..."
                 aria-describedby="btnNavbarSearch" />
             <button class="btn btn-primary" id="btnNavbarSearch" type="button">
                 <i class="fas fa-search"></i>
             </button>
-        </div>
+        </div> -->
     </form>
 
     <!-- Navbar Links-->
@@ -55,7 +55,7 @@
     </ul>
 
     <!-- Dark Mode Toggle -->
-    <button id="darkModeToggle" class="btn btn-outline-light ms-2 me-3" title="Toggle Dark Mode">
+    <!-- <button id="darkModeToggle" class="btn btn-outline-light ms-2 me-3" title="Toggle Dark Mode">
         <i class="bi bi-moon"></i>
-    </button>
+    </button> -->
 </nav>

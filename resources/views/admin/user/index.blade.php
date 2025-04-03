@@ -46,7 +46,7 @@
                                     <td>{{ $item->gender }}</td>
                                     <td>{{ $item->phone }}</td>
                                     <td>{{ $item->department->dpname }}</td>
-                                    <td>{{ $item->role_as == '1' ? 'Admin' : 'User' }}</td>
+                                    <td>{{ $item->role_as == '1' ? 'Admin' : ($item->role_as == '2' ? 'Blogger' : 'User'); }}</td>
                                     <td>
                                         <a href="{{ url('admin/user/' . $item->id . '/edit') }}" class="btn btn-warning btn-sm">
                                             <i class="bi bi-pencil"></i>

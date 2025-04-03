@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="description">Description:</label>
+                            <label for="description">Approved by On OTC:</label>
                             <textarea id="description" name="description"
                                 class="form-control @error('description') is-invalid @enderror"
                                 autofocus>{{ old('description', $department->description) }}</textarea>

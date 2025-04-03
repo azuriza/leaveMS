@@ -1,4 +1,5 @@
 @extends('layouts.employee')
+@section('title', 'Apply Leave')
 
 @section('content')
 <div class="container py-5">

@@ -28,7 +28,8 @@ class HomeController extends Controller
         if ($user->role_as == '1') {
           return redirect('admin/dashboard')->with(['status' => 'Already logged in', 'status_code' => 'success']);
         } else if ($user->role_as == '0') {
-          return redirect('show/applyleave')->with(['status' => ' Logged In Successful', 'status_code' => 'success']);
+          // return redirect('show/applyleave')->with(['status' => ' Logged In Successful', 'status_code' => 'success']);
+          return redirect('/dashboard')->with(['status' => ' Logged In Successful', 'status_code' => 'success']);
         }
     }
 
@@ -40,6 +41,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('Pages.index');
+      //return view('Pages.index');
+      $user = Auth::user();
+      if ($user->role_as == '1') {
+        return redirect('admin/dashboard');
+      } else if ($user->role_as == '0') {
+        // return redirect('show/applyleave')->with(['status' => ' Logged In Successful', 'status_code' => 'success']);
+        return redirect('/dashboard');
+      }
     }
 }

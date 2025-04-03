@@ -202,9 +202,13 @@ class ApplyleaveController extends Controller
              }
              else
              {
-                if(($data->status) === 0)
+                if(($data->status) === 1)
                 {
-          
+                    return redirect('show/applyleave')->with(['status' => 'Accepted! You cannot update anymore!', 'status_code' => 'error']);  
+                } 
+                else
+                if(($data->status) === 0)
+                {          
                     if ($data) {
                         $data->description = $request->input('description');
                         $data->leave_from = $request->input('leave_from');

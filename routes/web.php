@@ -17,10 +17,12 @@ Route::post('add/applyleave', [ApplyleaveController::class, 'store']);
 Route::get('show/applyleave', [ApplyleaveController::class, 'show']);
 Route::get('edit/applyleave/{id}', [ApplyleaveController::class, '_edit']);
 Route::put('update/applyleave/{id}', [ApplyleaveController::class, '_update']);
+Route::get('/dashboard', [DashboardController::class, 'dashemployee']);
 
 Auth::routes();
 Route::get('/', [HomeController::class, 'index'])->name('homepage');
 Route::get('/home', [HomeController::class, 'home'])->name('home');
+
 
 // Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
 //  Route::get('/register', [RegisterController::class, 'create'])->name('auth.register');

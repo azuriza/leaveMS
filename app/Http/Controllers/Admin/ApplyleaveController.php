@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Applyleave;
 use App\Models\Leavetype;
 use App\Models\User;
+use App\Models\Department;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ApplyleaveController extends Controller
 {
@@ -19,7 +22,12 @@ class ApplyleaveController extends Controller
      */
     public function index()
     {
-        $data = Applyleave::all();
+        //$user_id = Auth::user()->id;
+        $dep = Auth::user()->department_id;
+        $data = Applyleave::whereHas('User', function($query) use ($dep) {
+            $query->where('department_id', $dep);
+        })->with(['User.department'])->get();
+        //$data = Applyleave::all();
         return view('admin.Applyleave.index', compact('data'));
     }
 

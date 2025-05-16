@@ -27,6 +27,7 @@ class LeavetypeController extends Controller
         $leavetype = new Leavetype;
         $leavetype->leave_type = $request->input('leave_type');
         $leavetype->description = $request->input('description');
+        $leavetype->status = '1';
         $leavetype->save();
 
         return redirect('admin/leavetype')->with(['status' => 'Leave Type Added Successfully', 'status_code' => 'success']);

@@ -34,7 +34,7 @@ class LoginController extends Controller
         if (Auth::user()->role_as == '1') {
             return redirect('admin/dashboard')->with(['status' => ' Welcome to Admin Dashboard', 'status_code' => 'success']);
         } else if (Auth::user()->role_as == '0') {
-            return redirect('admin/dashboard')->with(['status' => ' Logged In Successful', 'status_code' => 'success']);
+            return redirect('/dashboard')->with(['status' => ' Logged In Successful', 'status_code' => 'success']);
         } else {
             return redirect('/home');
         }

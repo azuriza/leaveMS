@@ -61,7 +61,6 @@
                                 @enderror
                             </div>
 
-
                             <!-- Description -->
                             <div class="form-group  mb-3">
                                 <label for="description">{{ __('Description:') }}</label>
@@ -85,7 +84,7 @@
                             </div>
 
                             <!-- Leave To -->
-                            <div class="form-group col-6 mb-3">
+                            <div class="form-group col-6 mb-3" id="leave_to_container">
                                 <label for="leave_to">{{ __('Leave To:') }}</label>
                                 <input id="leave_to" type="date"
                                     class="form-control @error('leave_to') is-invalid @enderror" name="leave_to"
@@ -108,5 +107,38 @@
         </div>
     </div>
 </div>
+
+<!-- JS to hide Leave To -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const leaveType = document.getElementById("leave_type_id");
+        const leaveToContainer = document.getElementById("leave_to_container");
+        const leaveFromInput = document.getElementById("leave_from");
+        const leaveToInput = document.getElementById("leave_to");
+
+         // Otomatis isi Leave To saat Leave From dipilih
+         leaveFromInput.addEventListener("change", function () {
+            leaveToInput.value = leaveFromInput.value;
+        });
+ 
+        function toggleLeaveTo() {
+            if (leaveType.value === "10") { // misal ID leave_type untuk 'sick' = 1
+                leaveToContainer.style.display = "none";
+                leaveToInput.value = leaveFromInput.value;
+            } else {
+                leaveToContainer.style.display = "block";
+            }
+        }
+
+       // Panggil saat halaman dimuat
+       if (leaveFromInput.value) {
+            leaveToInput.value = leaveFromInput.value;
+        }
+
+        // Call on change
+        leaveType.addEventListener("change", toggleLeaveTo);
+    });
+</script>
+
 
 @endsection

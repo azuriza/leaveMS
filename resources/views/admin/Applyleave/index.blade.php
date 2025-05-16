@@ -21,8 +21,8 @@
           <table id="mydataTable" class="table table-striped table-bordered " class="display nowrap" style="width:100%">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>User_Id</th>
+                <th>No.</th>
+                <th>Employee_Name</th>
                 <th>Leave_Type_Id</th>
                 <th>Description</th>
                 <th>Leave_From</th>
@@ -35,7 +35,7 @@
             <tbody>
               @foreach($data as $item)
                 <tr>
-                <td>{{$item->id}}</td>
+                <td>{{$loop->iteration}}</td>
                 <td>{{$item->User->name . ' ' . $item->User->last_name}}</td>
                 <td>{{$item->leavetype->leave_type}}</td>
                 <td>{{$item->description}}</td>
@@ -109,14 +109,14 @@
                     title="Update">
                     <i class="bi bi-pencil-fill"></i>
                   </a>
-                  <form action="{{ url('admin/delete/applyleave/' . $item->id) }}" method="POST"
+                  <!-- <form action="{{ url('admin/delete/applyleave/' . $item->id) }}" method="POST"
                     style="display: inline;">
                     @csrf
                     @method('DELETE')
                     <button class="btn btn-danger" type="submit" title="Delete">
                     <i class="bi bi-trash-fill"></i>
                     </button>
-                  </form>
+                  </form> -->
                   </div>
                 </td>
                 </tr>

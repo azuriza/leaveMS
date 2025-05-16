@@ -24,7 +24,7 @@
                             <tr>
                                 <th>Index</th>
                                 <th>Leave Type</th>
-                                <th>Status</th>
+                                <!-- <th>Status</th> -->
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -33,13 +33,13 @@
                                 <tr>
                                     <td>{{$index + 1}}</td>
                                     <td>{{$item->leave_type}}</td>
-                                    <td>
+                                    <!-- <td>
                                         @if($item->status == '1')
                                             <span class="badge bg-success">Approved</span>
                                         @else
                                             <span class="badge bg-warning text-dark">Waiting Approval</span>
                                         @endif
-                                    </td>
+                                    </td> -->
                                     <td>
                                         <a href="{{url('admin/edit/leavetype/' . ($item->id))}}"
                                             class="btn btn-warning btn-sm">

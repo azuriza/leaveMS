@@ -32,7 +32,8 @@ Route::get('/home', [HomeController::class, 'home'])->name('home');
 Route::get('/profile', [UserController::class, 'show'])->name('profile');
 Route::post('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
-Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () { 
+//Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () { 
+Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
   Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin/dashboard');
   Route::get('category', [CategoryController::class, 'index']);
   Route::get('add/category', [CategoryController::class, 'create']);
@@ -73,6 +74,42 @@ Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
   Route::put('update/department/{id}', [DepartmentController::class, 'update']);
   Route::delete('delete/department/{id}', [DepartmentController::class, 'delete']);
 });
+
+Route::prefix('manager')->middleware(['auth', 'role:2'])->group(function () {
+  Route::get('/dashboard', [DashboardController::class, 'index'])->name('manager/dashboard');
+  Route::get('category', [CategoryController::class, 'index']);
+  Route::get('add/category', [CategoryController::class, 'create']);
+  Route::post('add_category', [CategoryController::class, 'store']);
+  Route::get('edit_category/{category_id}', [CategoryController::class, 'edit']);
+  Route::put('update_category/{category_id}', [CategoryController::class, 'update']);
+  Route::delete('delete_category/{category_id}', [CategoryController::class, 'delete']);
+
+  // Leavetype inside admin panel
+  Route::get('leavetype', [LeavetypeController::class, 'index']);
+  Route::get('add/leavetype', [LeavetypeController::class, 'create']);
+  Route::post('add/leavetype', [LeavetypeController::class, 'store']);
+  Route::get('edit/leavetype/{id}', [LeavetypeController::class, 'edit']);
+  Route::put('update/leavetype/{id}', [LeavetypeController::class, 'update']);
+  Route::delete('delete/leavetype/{id}', [LeavetypeController::class, 'delete']);
+
+  //users inside admin panel
+  Route::get('users', [UserController::class, 'index']);
+  Route::get('add/user', [UserController::class, 'create']);
+  Route::post('add/user', [UserController::class, 'store']);
+  Route::get('user/{user_id}/edit', [UserController::class, 'edit']);
+  Route::put('update_user/{user_id}', [UserController::class, 'update']);
+  Route::delete('delete/user/{user_id}',[UserController::class,'destroy']);
+
+  // Leave Types Routes
+  Route::get('applyleave', [ApplyleaveController::class, 'index']);
+  Route::get('add/applyleave', [ApplyleaveController::class, '_create']);// contructed create for admin
+  Route::post('add/applyleave', [ApplyleaveController::class, 'register']);// store in admin contsructed
+  Route::get('edit/applyleave/{id}', [ApplyleaveController::class, 'edit']);
+  Route::put('update/applyleave/{id}', [ApplyleaveController::class, 'update']);
+  Route::delete('delete/applyleave/{id}', [ApplyleaveController::class, 'delete']);
+});
+
+
 
 
 

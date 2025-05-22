@@ -30,6 +30,11 @@ class User extends Authenticatable
         return $this->hasMany(Applyleave::class);
     }
 
+    public function isEmployee()
+    {
+        return $this->role_as === 0;
+    }
+    
     protected $table = 'users';
 
     protected $fillable = [

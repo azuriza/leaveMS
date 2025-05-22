@@ -22,7 +22,11 @@ class UserController extends Controller
   public function show()
   {
     $user = Auth::user();
-    return view('auth.profile.show', compact('user'));
+    $layout = auth()->user()->isEmployee()
+    ? 'layouts.employee'
+    : 'layouts.backend';
+
+    return view('auth.profile.show', compact('user','layout'));
   }
   public function create()
   {

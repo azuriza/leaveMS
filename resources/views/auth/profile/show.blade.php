@@ -1,4 +1,4 @@
-@extends('layouts.backend')
+@extends($layout)
 
 @section('title', 'Profile')
 
@@ -47,6 +47,16 @@
                                 <input name="email" id="email" type="email" class="form-control"
                                     value="{{ old('email', $user->email) }}" />
                                 @error('email')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                             <!-- Departement -->
+                            <div class="form-group col-sm-12 col-md-6 mb-3">
+                                <label for="department">Departement</label>
+                                <input name="department" id="department" type="department" class="form-control"
+                                    value="{{ old('department->dpname', $user->department->dpname) }}" readonly/>
+                                @error('department->dpname')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                             </div>

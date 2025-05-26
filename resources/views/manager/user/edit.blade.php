@@ -137,24 +137,7 @@
                                 @error('email')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                            </div>
-
-                            <div class="form-group col-md-4 mb-3">
-                                <label for="role_as">Update Role</label>
-                                <select
-                                    v-model="user.role_as"
-                                    id="role_as"
-                                    name="role_as"
-                                    class="form-control @error('role_as') is-invalid @enderror"
-                                >
-                                    <option value="0" {{ old('role_as', $user->role_as) == '0' ? 'selected' : '' }}>Employee</option>
-                                    <option value="1" {{ old('role_as', $user->role_as) == '1' ? 'selected' : '' }}>Admin</option>
-                                    <option value="2" {{ old('role_as', $user->role_as) == '2' ? 'selected' : '' }}>Manager</option>
-                                </select>
-                                @error('role_as')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+                            </div>                            
 
                             <div class="form-group col-md-4 mb-3">
                                 <label for="password">Password</label>
@@ -170,11 +153,27 @@
                                 @error('password')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                            </div>
-
+                            </div>  
                             <div class="form-group col-md-4 mb-3">
-                                <button type="submit" class="btn btn-primary">Update</button>
-                            </div>
+                                <label for="role_as" hidden>Update Role</label>
+                                <select
+                                    v-model="user.role_as"
+                                    id="role_as"
+                                    name="role_as"
+                                    class="form-control @error('role_as') is-invalid @enderror"
+                                    hidden
+                                >
+                                    <option value="0" {{ old('role_as', $user->role_as) == '0' ? 'selected' : '' }}>Employee</option>
+                                    <option value="1" {{ old('role_as', $user->role_as) == '1' ? 'selected' : '' }}>Admin</option>
+                                    <option value="2" {{ old('role_as', $user->role_as) == '2' ? 'selected' : '' }}>Manager</option>
+                                </select>
+                                @error('role_as')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>                          
+                        </div>
+                        <div class="form-group col-md-4 mb-3">
+                            <button type="submit" class="btn btn-primary">Update</button>
                         </div>
 
                     </form>

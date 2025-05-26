@@ -8,6 +8,7 @@ use App\Models\Department;
 use App\Models\Leavetype;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -17,25 +18,32 @@ class DashboardController extends Controller
         $leavetypes = Leavetype::count();
         $leaves = Applyleave::count();
         $users = User::where('role_as', '0')->count();
+        $managers = User::where('role_as', '2')->count();
         $admins = User::where('role_as', '1')->count();
-        return view('admin.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'admins'));
+        return view('admin.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'managers','admins'));
     }
     public function dashmanager()
     {
         $departments = Department::count();
         $leavetypes = Leavetype::count();
         $leaves = Applyleave::count();
-        $users = User::where('role_as', '0')->count();
+        $departmentOfLoggedInUser = Auth::user()->department_id;
+        $users = User::where('role_as', '0')
+                ->where('department_id', $departmentOfLoggedInUser)
+                ->count();
+        $managers = User::where('role_as', '2')->count();
         $admins = User::where('role_as', '1')->count();
-        return view('manager.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'admins'));
+        return view('manager.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'managers', 'admins'));
     }
     public function dashemployee()
     {
+        $user_id = Auth::user()->id;
         $departments = Department::count();
         $leavetypes = Leavetype::count();
-        $leaves = Applyleave::count();
+        $leaves = Applyleave::where('user_id', $user_id)->count();
         $users = User::where('role_as', '0')->count();
+        $managers = User::where('role_as', '2')->count();
         $admins = User::where('role_as', '1')->count();
-        return view('Pages.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'admins'));
+        return view('Pages.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'managers', 'admins'));
     }
 }

@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             ApplyLeavesTableSeeder::class,
             ProductsTableSeeder::class,
-            CategoriesTableSeeder::class
+            CategoriesTableSeeder::class,
+            LeaveBalanceSeeder::class
         ]);
     }
 }

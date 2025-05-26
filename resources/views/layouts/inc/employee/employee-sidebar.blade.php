@@ -12,7 +12,7 @@
                 <div class="sb-sidenav-menu-heading">Interface</div>
                 <a class="nav-link collapsed {{ request()->is('add/applyleave') || request()->is('show/applyleave') ? 'active' : '' }}" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                    Leave Type
+                    Applied Leave
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse {{ request()->is('add/applyleave') || request()->is('show/applyleave') ? 'show' : '' }}" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">

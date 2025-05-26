@@ -23,6 +23,22 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-4 mb-3">
+                                <label for="employeeid">Employee ID:</label>
+                                <input
+                                    v-model="user.employeeid"
+                                    type="text"
+                                    id="employeeid"
+                                    class="form-control @error('employeeid') is-invalid @enderror"
+                                    name="employeeid"
+                                    value="{{ old('employeeid') }}"
+                                    autocomplete="employeeid"
+                                    autofocus
+                                />
+                                @error('employeeid')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label for="name">First Name:</label>
                                 <input
                                     v-model="user.name"

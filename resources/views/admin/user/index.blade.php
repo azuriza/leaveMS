@@ -26,11 +26,11 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>ID</th>
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Email</th>
-                                <th>Gender</th>
-                                <th>Phone</th>
+                                <th>Gender</th> 
                                 <th>Department</th>
                                 <th>Role</th>
                                 <th>Actions</th>
@@ -40,13 +40,17 @@
                             @foreach($users as $index => $item)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
+                                    <td>{{ $item->employeeid }}</td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->last_name }}</td>
                                     <td>{{ $item->email }}</td>
                                     <td>{{ $item->gender }}</td>
-                                    <td>{{ $item->phone }}</td>
                                     <td>{{ $item->department->dpname }}</td>
-                                    <td>{{ $item->role_as == '1' ? 'Admin' : ($item->role_as == '2' ? 'Blogger' : 'User'); }}</td>
+                                    <td>{{
+                                            $item->role_as == '1' ? 'Admin' :
+                                            ($item->role_as == '2' ? 'Manager' :
+                                            ($item->role_as == '0' ? 'Employee' : 'Unknown'))
+                                        }}</td>
                                     <td>
                                         <a href="{{ url('admin/user/' . $item->id . '/edit') }}" class="btn btn-warning btn-sm">
                                             <i class="bi bi-pencil"></i>

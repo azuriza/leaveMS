@@ -13,12 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-  public function index()
-  {
-    $users = User::all();
-    return view('admin.user.index', ['users' => $users]);
-  }
-
+  //profile
   public function show()
   {
     $user = Auth::user();
@@ -28,43 +23,6 @@ class UserController extends Controller
 
     return view('auth.profile.show', compact('user','layout'));
   }
-  public function create()
-  {
-    $departments = Department::all();
-    $users = User::all();
-    return view('admin.user.create', ['departments' => $departments, 'users' => $users]);
-  }
-  public function store(Request $request)
-  {
-    $request->validate([
-      'name' => ['required', 'string', 'max:255'],
-      'last_name' => ['required', 'string', 'max:255'],
-      'gender' => ['required', 'string', 'max:50'],
-      'phone' => ['required', 'string', 'max:12'],
-      'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-      'department_id' => ['required', 'integer'],
-      'password' => ['required', 'string', 'min:8', 'confirmed'],
-    ]);
-
-    $user = new User;
-    $user->name = $request->input('name');
-    $user->last_name = $request->input('last_name');
-    $user->gender = $request->input('gender');
-    $user->phone = $request->input('phone');
-    $user->email = $request->input('email');
-    $user->department_id = $request->input('department_id');
-    $user->password = Hash::make($request->input('password'));
-    $user->save();
-
-    return redirect('admin/add/user')->with(['status' => 'User Added Successfully', 'status_code' => 'success']);
-  }
-
-  public function edit($user_id)
-  {
-    $user = User::find($user_id);
-    return view('admin.user.edit', compact('user'));
-  }
-
   public function updateProfile(Request $request)
   {
     $user_id = Auth::user()->id;
@@ -103,6 +61,190 @@ class UserController extends Controller
 
     return redirect()->route('profile')->with(['status' => 'Profile updated successfully.', 'status_code' => 'success']);
   }
+
+  //Create admin user  
+  public function index()
+  {
+    $users = User::where('department_id', auth()->user()->department_id)->get();
+    return view('admin.user.index', ['users' => $users]);
+  }
+  
+  public function create()
+  {
+    $departments = Department::all();
+    $users = User::all();
+    return view('admin.user.create', ['departments' => $departments, 'users' => $users]);
+  }
+  public function store(Request $request)
+  {
+    $request->validate([
+      'employeeid' => ['required', 'string', 'max:6'],
+      'name' => ['required', 'string', 'max:255'],
+      'last_name' => ['required', 'string', 'max:255'],
+      'gender' => ['required', 'string', 'max:50'],
+      'phone' => ['required', 'string', 'max:12'],
+      'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+      'department_id' => ['required', 'integer'],
+      'password' => ['required', 'string', 'min:8', 'confirmed'],
+    ]);
+
+    $user = new User;
+    $user->employeeid = $request->input('employeeid');
+    $user->name = $request->input('name');
+    $user->last_name = $request->input('last_name');
+    $user->gender = $request->input('gender');
+    $user->phone = $request->input('phone');
+    $user->email = $request->input('email');
+    $user->department_id = $request->input('department_id');
+    $user->password = Hash::make($request->input('password'));
+    $user->save();
+
+    return redirect('admin/add/user')->with(['status' => 'User Added Successfully', 'status_code' => 'success']);
+  }
+
+  public function edit($user_id)
+  {
+    $user = User::find($user_id);
+    return view('admin.user.edit', compact('user'));
+  }
+
+  public function update(Request $request, $user_id)
+  {
+    $request->validate([
+        'employeeid' => ['required', 'string', 'max:6'],
+        'name' => ['required', 'string', 'max:255'],
+        'last_name' => ['required', 'string', 'max:255'],
+        'gender' => ['required', 'string', 'max:50'],
+        'phone' => ['required', 'string', 'max:12'],
+        'email' => ['required', 'string', 'email', 'max:255'],
+        'role_as' => ['required', 'integer'],
+        'password' => ['nullable', 'string', 'min:8'],
+    ]);
+
+    $user = User::find($user_id);
+    if ($user) {
+        // Update user attributes
+        $user->employeeid = $request->input('employeeid');
+        $user->name = $request->input('name');
+        $user->last_name = $request->input('last_name');
+        $user->gender = $request->input('gender');
+        $user->phone = $request->input('phone');
+        $user->email = $request->input('email');
+        $user->role_as = $request->input('role_as');
+
+        // Only update the password if a new one is provided
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->input('password'));
+        }
+
+        $user->update();
+
+        return redirect('admin/users')->with(['status' => 'User Updated Successfully', 'status_code' => 'success']);
+    } else {
+        return redirect('admin/users')->with(['status' => 'No User Found', 'status_code' => 'error']);
+    }
+  }
+
+  public function destroy($user_id)
+  {
+    $user = User::find($user_id);
+    $user->delete();
+    return redirect('admin/users')->with(['status' => 'User Deleted Successfully', 'status_code' => 'success']);
+  }
+
+  //Create manager user  
+  public function indexmanager()
+  {
+    //$users = User::all();
+    $users = User::where('department_id', auth()->user()->department_id)
+             ->whereIn('role_as', [0, 2])
+             ->get();
+    return view('manager.user.index', ['users' => $users]);
+  }
+  
+  public function createmanager()
+  {
+    $departments = Department::all();
+    $users = User::all();
+    return view('manager.user.create', ['departments' => $departments, 'users' => $users]);
+  }
+  public function storemanager(Request $request)
+  {
+    $request->validate([
+      'employeeid' => ['required', 'string', 'max:6'],
+      'name' => ['required', 'string', 'max:255'],
+      'last_name' => ['required', 'string', 'max:255'],
+      'gender' => ['required', 'string', 'max:50'],
+      'phone' => ['required', 'string', 'max:12'],
+      'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+      'department_id' => ['required', 'integer'],
+      'password' => ['required', 'string', 'min:8', 'confirmed'],
+    ]);
+
+    $user = new User;
+    $user->employeeid = $request->input('employeeid');
+    $user->name = $request->input('name');
+    $user->last_name = $request->input('last_name');
+    $user->gender = $request->input('gender');
+    $user->phone = $request->input('phone');
+    $user->email = $request->input('email');
+    $user->department_id = $request->input('department_id');
+    $user->password = Hash::make($request->input('password'));
+    $user->save();
+
+    return redirect('manager/add/user')->with(['status' => 'User Added Successfully', 'status_code' => 'success']);
+  }
+
+  public function editmanager($user_id)
+  {
+    $user = User::find($user_id);
+    return view('manager.user.edit', compact('user'));
+  }
+  
+  public function updatemanager(Request $request, $user_id)
+  {
+    $request->validate([
+        'employeeid' => ['required', 'string', 'max:6'],
+        'name' => ['required', 'string', 'max:255'],
+        'last_name' => ['required', 'string', 'max:255'],
+        'gender' => ['required', 'string', 'max:50'],
+        'phone' => ['required', 'string', 'max:12'],
+        'email' => ['required', 'string', 'email', 'max:255'],
+        'role_as' => ['required', 'integer'],
+        'password' => ['nullable', 'string', 'min:8'],
+    ]);
+
+    $user = User::find($user_id);
+    if ($user) {
+        // Update user attributes
+        $user->employeeid = $request->input('employeeid');
+        $user->name = $request->input('name');
+        $user->last_name = $request->input('last_name');
+        $user->gender = $request->input('gender');
+        $user->phone = $request->input('phone');
+        $user->email = $request->input('email');
+        $user->role_as = $request->input('role_as');
+
+        // Only update the password if a new one is provided
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->input('password'));
+        }
+
+        $user->update();
+
+        return redirect('manager/users')->with(['status' => 'User Updated Successfully', 'status_code' => 'success']);
+    } else {
+        return redirect('manager/users')->with(['status' => 'No User Found', 'status_code' => 'error']);
+    }
+  }
+
+  public function destroymanager($user_id)
+  {
+    $user = User::find($user_id);
+    $user->delete();
+    return redirect('manager/users')->with(['status' => 'User Deleted Successfully', 'status_code' => 'success']);
+  } 
+  
   // public function update(Request $request, $user_id)
   // {
   //   $request->validate([
@@ -131,48 +273,5 @@ class UserController extends Controller
   //   } else {
   //     return redirect('admin/users')->with(['status' => 'No User Found', 'status_code' => 'error']);
   //   }
-  // }
-
-
-  public function update(Request $request, $user_id)
-{
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'last_name' => ['required', 'string', 'max:255'],
-        'gender' => ['required', 'string', 'max:50'],
-        'phone' => ['required', 'string', 'max:12'],
-        'email' => ['required', 'string', 'email', 'max:255'],
-        'role_as' => ['required', 'integer'],
-        'password' => ['nullable', 'string', 'min:8'],
-    ]);
-
-    $user = User::find($user_id);
-    if ($user) {
-        // Update user attributes
-        $user->name = $request->input('name');
-        $user->last_name = $request->input('last_name');
-        $user->gender = $request->input('gender');
-        $user->phone = $request->input('phone');
-        $user->email = $request->input('email');
-        $user->role_as = $request->input('role_as');
-
-        // Only update the password if a new one is provided
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->input('password'));
-        }
-
-        $user->update();
-
-        return redirect('admin/users')->with(['status' => 'User Updated Successfully', 'status_code' => 'success']);
-    } else {
-        return redirect('admin/users')->with(['status' => 'No User Found', 'status_code' => 'error']);
-    }
-}
-
-  public function destroy($user_id)
-  {
-    $user = User::find($user_id);
-    $user->delete();
-    return redirect('admin/users')->with(['status' => 'User Deleted Successfully', 'status_code' => 'success']);
-  }
+  // }  
 }

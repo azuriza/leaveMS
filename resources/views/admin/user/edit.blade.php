@@ -37,6 +37,23 @@
                             </div>
 
                             <div class="form-group col-md-4 mb-3">
+                                <label for="employeeid">Employee ID</label>
+                                <input
+                                    v-model="user.employeeid"
+                                    type="text"
+                                    id="employeeid"
+                                    class="form-control @error('employeeid') is-invalid @enderror"
+                                    name="employeeid"
+                                    value="{{ old('employeeid', $user->employeeid) }}"
+                                    autocomplete="employeeid"
+                                    autofocus
+                                />
+                                @error('employeeid')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group col-md-4 mb-3">
                                 <label for="name">First Name</label>
                                 <input
                                     v-model="user.name"
@@ -130,9 +147,9 @@
                                     name="role_as"
                                     class="form-control @error('role_as') is-invalid @enderror"
                                 >
-                                    <option value="0" {{ old('role_as', $user->role_as) == '0' ? 'selected' : '' }}>User</option>
+                                    <option value="0" {{ old('role_as', $user->role_as) == '0' ? 'selected' : '' }}>Employee</option>
                                     <option value="1" {{ old('role_as', $user->role_as) == '1' ? 'selected' : '' }}>Admin</option>
-                                    <option value="2" {{ old('role_as', $user->role_as) == '2' ? 'selected' : '' }}>Blogger</option>
+                                    <option value="2" {{ old('role_as', $user->role_as) == '2' ? 'selected' : '' }}>Manager</option>
                                 </select>
                                 @error('role_as')
                                     <span class="text-danger">{{ $message }}</span>

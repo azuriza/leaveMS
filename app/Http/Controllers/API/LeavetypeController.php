@@ -56,6 +56,7 @@ class LeavetypeController extends Controller
             if($leavetype)
             {
               $leavetype->leave_type = $request->input('leave_type');
+              $leavetype->description = $request->input('description');
               $leavetype->save();
               
               return response()->json(['message'=>'Leave Type Added Successfully'],200);

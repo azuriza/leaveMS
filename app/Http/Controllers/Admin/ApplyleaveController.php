@@ -7,6 +7,8 @@ use App\Models\Applyleave;
 use App\Models\Leavetype;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\LeaveBalance;
+use App\Helpers\DateHelper;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -201,7 +203,10 @@ class ApplyleaveController extends Controller
     //implementation employee
     public function create() // applies on fronted
     {
-        $users = User::all();
+        //$users = User::all();
+        $users = User::where('department_id', auth()->user()->department_id)
+                    ->where('role_as', 0)            
+                    ->get();
         $leavetype = Leavetype::all();
         return view('Pages.Applyleave.create', ['users' => $users], ['leavetype' => $leavetype]);
     }
@@ -213,7 +218,8 @@ class ApplyleaveController extends Controller
             'leave_type_id' => 'required',
             'description' => 'required',
             'leave_from' => 'required',
-            'leave_to' => 'required'
+            'leave_to' => 'required',
+            'handover_id' => 'required'
         ]);
 
         $data = new Applyleave;
@@ -222,7 +228,20 @@ class ApplyleaveController extends Controller
         $data->description = $request->input('description');
         $data->leave_from = $request->input('leave_from');
         $data->leave_to = $request->input('leave_to');
+        $data->handover_id = $request->input('handover_id');
         $data->save();
+
+        $jumlahHari = DateHelper::getWorkdays($request->input('leave_from'), $request->input('leave_from')); 
+
+        // 2. Update cuti_terpakai di leave_balances
+        $tahun = now()->year;
+        $balance = LeaveBalance::where('user_id', $request->user_id)
+            ->where('tahun', $tahun)
+            ->first();
+
+        if ($balance) {
+            $balance->increment('cuti_terpakai', $jumlahHari);
+        }
 
         return redirect('add/applyleave')->with(['status' => 'Leave Applied Successfully. You have 2 days to update your application', 'status_code' => 'success']);
     }
@@ -236,7 +255,10 @@ class ApplyleaveController extends Controller
     public function _edit($id)// Frontend
     {
         $data = Applyleave::find($id);
-        return view('Pages.Applyleave.edit', compact('data'));
+        $users = User::where('department_id', auth()->user()->department_id)
+                    ->where('role_as', 0)            
+                    ->get();
+        return view('Pages.Applyleave.edit', compact('data','users'));
     }
 
     public function _update(Request $request, $id) // Update on the frontend
@@ -244,7 +266,8 @@ class ApplyleaveController extends Controller
         $validator = Validator::make($request->all(), [
             'description' => 'required',
             'leave_from' => 'required',
-            'leave_to' => 'required'
+            'leave_to' => 'required',
+            'handover_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -284,6 +307,7 @@ class ApplyleaveController extends Controller
                         $data->description = $request->input('description');
                         $data->leave_from = $request->input('leave_from');
                         $data->leave_to = $request->input('leave_to');
+                        $data->handover_id = $request->input('handover_id');
                         $data->update();
         
                         return redirect('show/applyleave')->with(['status' => 'Leave updated successfully and is being processed', 'status_code' => 'success']);

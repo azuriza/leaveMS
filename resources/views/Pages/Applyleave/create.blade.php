@@ -77,6 +77,24 @@
                                 name="leave_to" value="{{ old('leave_to') }}" min=<?php echo date('Y-m-d'); ?> required
                                 autofocus>
                         </div>
+                        <div class="form-group mb-3">
+                                <label for="handover_id">Select User to Hand Over:</label>
+                                <select type="int" class="form-control @error('handover_id') is-invalid @enderror"
+                                name="handover_id" value="{{ old('handover_id') }}" required autocomplete="handover_id" autofocus>
+
+                                @if($users)
+                                    @foreach($users as $person)
+
+                                        <option value="{{$person->id}}" @if($person->name . ' ' . $person->last_name == Auth::user()->name . ' ' . Auth::user()->last_name) selected
+                                        @endif> {{$person->name . ' ' . $person->last_name}} </option>
+
+                                    @endforeach
+                                @endif
+                                </select>
+                                @error('handover_id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                        </div>
                         <!-- End -->
                         <!-- Submit form -->
                         <div class="form-group mb-3 rounded-pill">

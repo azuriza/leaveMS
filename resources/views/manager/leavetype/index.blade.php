@@ -3,10 +3,10 @@
 @section('content')
 
 <div class="container-fluid px-4">
-    <h4 class="mt-4">User</h4>
+    <h4 class="mt-4">Leave Type</h4>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item active">Dashboard</li>
-        <li class="breadcrumb-item">User</li>
+        <li class="breadcrumb-item">Leave Type</li>
     </ol>
     <div class="row mt-4">
         <div class="col-lg-12 col-xl-12 col-md-12">

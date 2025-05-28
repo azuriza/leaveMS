@@ -61,6 +61,33 @@
                                 name="leave_to" value="{{$data->leave_to}}" min=<?php echo date('Y-m-d'); ?> required
                                 autofocus>
                         </div>
+                        <div class="form-group col-6 mb-3">
+                            <label for="handover_id">Select User to Hand Over:</label>
+                            <select id="handover_id" class="form-control @error('handover_id') is-invalid @enderror"
+                                name="handover_id" autocomplete="handover_id" autofocus>
+                                @if($users)
+                                    @foreach($users as $person)
+                                        <option value="{{ $person->id }}" 
+                                            {{ (old('handover_id') ?? ($data->handover_id ?? Auth::user()->id)) == $person->id ? 'selected' : '' }}>
+                                            {{ $person->name . ' ' . $person->last_name }}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @error('handover_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <!-- <div class="form-group mb-3">
+                            <label for="handover_id">Select User to Hand Over:</label>
+                            <input id="handover_id" type="text"
+                                class="form-control @error('handover_id') is-invalid @enderror" name="handover_id"
+                                value="{{ $data->Handover->name . ' ' . $data->Handover->last_name }}"
+                                autocomplete="handover_id" />
+                            @error('handover_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>                        -->
                         <!-- End -->
                         <!-- Submit form -->
                         <div class="form-group mb-3 rounded-pill">

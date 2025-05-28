@@ -19,6 +19,10 @@ class Applyleave extends Model
     {
         return $this->belongsTo(User::class,'user_id');
     }  
+    public function Handover()
+    {
+        return $this->belongsTo(User::class,'handover_id');
+    } 
     protected $table ='applyleaves';
 
     protected $fillable = [
@@ -27,7 +31,8 @@ class Applyleave extends Model
         'description',
         'leave_from',
         'leave_to',
-        'status'
+        'status',
+        'handover_id'
         
     ];
   

@@ -1,65 +1,6 @@
 @extends('layouts.employee')
 @section('title', 'Leaves')
 @section('content')
-<?php
-
-/**
- * Count the number of working days between two dates.
- *
- * This function calculate the number of working days between two given dates,
- * taking account of the Public festivities, Easter and Easter Morning days,
- * the day of the Patron Saint (if any) and the working Saturday.
- *
- * @param   string  $date1    Start date ('YYYY-MM-DD' format)
- * @param   string  $date2    Ending date ('YYYY-MM-DD' format)
- * @param   boolean $workSat  TRUE if Saturday is a working day
- * @param   string  $patron   Day of the Patron Saint ('MM-DD' format)
- * @return  integer           Number of working days ('zero' on error)
- *
- * @author Massimo Simonini <massiws@gmail.com>
- */
-function getWorkdays($date1, $date2, $workSat = FALSE, $patron = NULL) {
-  if (!defined('SATURDAY')) define('SATURDAY', 6);
-  if (!defined('SUNDAY')) define('SUNDAY', 0);
-
-  // Array of all public festivities
-  $publicHolidays = array('01-01', '01-06', '04-25', '05-01', '06-02', '08-15', '11-01', '12-08', '12-25', '12-26');
-  // The Patron day (if any) is added to public festivities
-  if ($patron) {
-    $publicHolidays[] = $patron;
-  }
-
-  /*
-   * Array of all Easter Mondays in the given interval
-   */
-  $yearStart = date('Y', strtotime($date1));
-  $yearEnd   = date('Y', strtotime($date2));
-
-  for ($i = $yearStart; $i <= $yearEnd; $i++) {
-    $easter = date('Y-m-d', easter_date($i));
-    list($y, $m, $g) = explode("-", $easter);
-    $monday = mktime(0,0,0, date($m), date($g)+1, date($y));
-    $easterMondays[] = $monday;
-  }
-
-  $start = strtotime($date1);
-  $end   = strtotime($date2);
-  $workdays = 0;
-  for ($i = $start; $i <= $end; $i = strtotime("+1 day", $i)) {
-    $day = date("w", $i);  // 0=sun, 1=mon, ..., 6=sat
-    $mmgg = date('m-d', $i);
-    if ($day != SUNDAY &&
-      !in_array($mmgg, $publicHolidays) &&
-      !in_array($i, $easterMondays) &&
-      !($day == SATURDAY && $workSat == FALSE)) {
-        $workdays++;
-    }
-  }
-
-  return intval($workdays);
-}
-?>
-
 <div class="container py-5">
   <div class="row">
     <div class="col-md-12">
@@ -75,11 +16,12 @@ function getWorkdays($date1, $date2, $workSat = FALSE, $patron = NULL) {
               <tr>
                 <!-- I should comment this out cause already its the auth user <th>User_Id</th> -->
                 <!-- <th>Name</th> -->
-                <th>Leave_Type</th>
-                <th>Leave_From</th>
-                <th>Leave_To</th>
-                <th>Applied_At</th>
-                <th>Days_applied_For</th>
+                <th>Leave Type</th>
+                <th>Description</th>
+                <th>Leave From</th>
+                <th>Leave To</th>
+                <!-- <th>Applied_At</th> -->
+                <th>Days</th>
 
                 <th>Status</th>
                 <th>Edit</th>
@@ -94,24 +36,11 @@ function getWorkdays($date1, $date2, $workSat = FALSE, $patron = NULL) {
             <!--Remember that we had r/ship btw leave and leavetype hence i pass $item->leavetype->leave_type as if i was inside leave type instead of showing $item->leave_type_id to display name instead of id <td>{{$item->user_id}}</td> -->
             <!-- <td>{{$item->User->name . ' ' . $item->User->last_name}}</td> -->
             <td>{{$item->leavetype->leave_type}}</td>
+            <td>{{$item->description}}</td>
             <td>{{$item->leave_from}}</td>
             <td>{{$item->leave_to}}</td>
-            <td>{{$item->created_at}}</td>
-            <td>
-            <?php
-            
-        // Lets declare variables
-        $fdate = $item->leave_from;
-        $tdate = $item->leave_to;
-        $datetime1 = new Datetime($fdate);
-        $datetime2 = new Datetime($tdate);
-        $interval = $datetime1->diff($datetime2);
-        // $days = $interval->format('%a');
-        $days = getWorkdays($fdate,$tdate);
-        echo $days;
-            ?>
-            </td>
-
+            <!-- <td>{{$item->created_at}}</td> -->
+            <td>{{ DateHelper::getWorkdays($item->leave_from, $item->leave_to) }}</td>
             <td>
             <?php
         if ($item->status == '0') {

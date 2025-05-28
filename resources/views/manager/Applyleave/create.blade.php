@@ -95,7 +95,26 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
+                            <div class="form-group col-6 mb-3">
+                                <label for="user_id">Select User to Hand Over:</label>
+                                <select type="int" class="form-control @error('user_id') is-invalid @enderror"
+                                name="user_id" value="{{ old('user_id') }}" required autocomplete="user_id" autofocus>
+
+                                @if($users)
+                                    @foreach($users as $person)
+
+                                        <option value="{{$person->id}}" @if($person->name . ' ' . $person->last_name == Auth::user()->name . ' ' . Auth::user()->last_name) selected
+                                        @endif> {{$person->name . ' ' . $person->last_name}} </option>
+
+                                    @endforeach
+                                @endif
+                                </select>
+                                @error('user_id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
+                        
                         <!-- Submit Button -->
                         <div class="form-group col-md-4 mb-3">
                             <button type="submit" class="btn btn-primary">

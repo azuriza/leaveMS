@@ -43,10 +43,10 @@
                             @enderror
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label for="status">Status:</label>
+                        <div class="form-group mb-3" >
+                            <label for="status" hidden>Status:</label>
                             <select v-model="leavetype.status" id="status" name="status"
-                                class="form-control @error('status') is-invalid @enderror">
+                                class="form-control @error('status') is-invalid @enderror" hidden>
                                 <option value="0" {{ old('status', $leavetype->status) == '0' ? 'selected' : '' }}>
                                     Waiting Approval
                                 </option>

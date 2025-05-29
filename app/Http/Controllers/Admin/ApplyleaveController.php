@@ -219,7 +219,8 @@ class ApplyleaveController extends Controller
             'description' => 'required',
             'leave_from' => 'required',
             'leave_to' => 'required',
-            'handover_id' => 'required'
+            'handover_id' => 'required',
+            'leave_days' => 'required'
         ]);
 
         $data = new Applyleave;
@@ -229,9 +230,11 @@ class ApplyleaveController extends Controller
         $data->leave_from = $request->input('leave_from');
         $data->leave_to = $request->input('leave_to');
         $data->handover_id = $request->input('handover_id');
+        $data->leave_days = $request->input('leave_days');
         $data->save();
 
-        $jumlahHari = DateHelper::getWorkdays($request->input('leave_from'), $request->input('leave_from')); 
+        //$jumlahHari = DateHelper::getWorkdays($request->input('leave_from'), $request->input('leave_to'));
+        $jumlahHari = $request->input('leave_days'); 
 
         // 2. Update cuti_terpakai di leave_balances
         $tahun = now()->year;
@@ -267,7 +270,8 @@ class ApplyleaveController extends Controller
             'description' => 'required',
             'leave_from' => 'required',
             'leave_to' => 'required',
-            'handover_id' => 'required'
+            'handover_id' => 'required',
+            'leave_days' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -302,14 +306,35 @@ class ApplyleaveController extends Controller
                 } 
                 else
                 if(($data->status) === 0)
-                {          
+                {   
+                    // 1. Hitung jumlah hari lama
+                    $jumlahHariLama = $data->leave_days;
+                    $jumlahHariBaru = $request->input('leave_days');
+
                     if ($data) {
                         $data->description = $request->input('description');
                         $data->leave_from = $request->input('leave_from');
                         $data->leave_to = $request->input('leave_to');
                         $data->handover_id = $request->input('handover_id');
-                        $data->update();
-        
+                        $data->leave_days = $request->input('leave_days');
+                        $data->update();                        
+                    
+                    // 4. Hitung selisih dan update leave_balances
+                    $selisih = $jumlahHariBaru - $jumlahHariLama;
+                    $tahun = now()->year;
+
+                    $balance = LeaveBalance::where('user_id', $data->user_id)
+                        ->where('tahun', $tahun)
+                        ->first();
+
+                    if ($balance && $selisih !== 0) {
+                        if ($selisih > 0) {
+                            $balance->increment('cuti_terpakai', $selisih);
+                        } else {
+                            $balance->decrement('cuti_terpakai', abs($selisih));
+                        }
+                    }
+                                
                         return redirect('show/applyleave')->with(['status' => 'Leave updated successfully and is being processed', 'status_code' => 'success']);
                     } else {
                         return redirect('add/applyleave')->with(['status' => 'error', 'message' => 'Technical error ocurred , contact administrator.']);

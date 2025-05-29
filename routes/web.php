@@ -10,6 +10,18 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LeavetypeController;
 use App\Http\Controllers\Admin\ApplyleaveController;
 
+Route::get('/api/hitung-hari-kerja', function (\Illuminate\Http\Request $request) {
+    $from = $request->query('from');
+    $to = $request->query('to');
+
+    if ($from && $to) {
+        $jumlah = \App\Helpers\DateHelper::getWorkdays($from, $to);
+        return response()->json(['jumlah' => $jumlah]);
+    }
+
+    return response()->json(['jumlah' => 0]);
+});
+
 
 // Apply Leave on Frontend
 Route::get('add/applyleave', [ApplyleaveController::class, 'create']);

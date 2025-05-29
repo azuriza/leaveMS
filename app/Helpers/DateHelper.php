@@ -12,15 +12,21 @@ class DateHelper
         // Array of all public holidays (MM-DD)
         $publicHolidays = [
             '01-01', // New Year's Day
-            '01-06', // Epiphany
-            '04-25', // Liberation Day
+            '01-27', // Isra'Mi'raj
+            '01-29', // Imlek
+            '03-29', // Nyepi
+            '03-31', // Idul Fitri
+            '04-01', // Idul Fitri
+            '04-18', // Jumat Agung
             '05-01', // Labor Day
-            '06-02', // Republic Day
-            '08-15', // Assumption of Mary
-            '11-01', // All Saints' Day
-            '12-08', // Immaculate Conception
+            '05-12', // Isa Al Masih
+            '05-29', // Waisak
+            '06-01', // Pancasila
+            '06-07', // Idul Adha
+            '06-27', // Hijriyah
+            '08-17', // HUT RI
+            '09-05', // Maulid Nabi
             '12-25', // Christmas
-            '12-26', // St. Stephen's Day
         ];
 
         // Add patron saint day (MM-DD format)

@@ -95,6 +95,15 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
+                            <div class="form-group col-6 mb-3" id="leave_to_container">
+                                <label for="leave_days">Days</label>
+                                <input type="text" id="leave_days" name="leave_days"
+                                    class="form-control @error('leave_days') is-invalid @enderror"
+                                    value="{{ old('leave_days') }}" readonly />
+                                @error('leave_days')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                             <div class="form-group col-6 mb-3">
                                 <label for="user_id">Select User to Hand Over:</label>
                                 <select type="int" class="form-control @error('user_id') is-invalid @enderror"
@@ -136,16 +145,18 @@
         const leaveToContainer = document.getElementById("leave_to_container");
         const leaveFromInput = document.getElementById("leave_from");
         const leaveToInput = document.getElementById("leave_to");
+        const leaveDays = document.getElementById("leave_days");
 
          // Otomatis isi Leave To saat Leave From dipilih
-         leaveFromInput.addEventListener("change", function () {
-            leaveToInput.value = leaveFromInput.value;
-        });
+        //  leaveFromInput.addEventListener("change", function () {
+        //     leaveToInput.value = leaveFromInput.value;
+        // });
  
         function toggleLeaveTo() {
             if (leaveType.value === "10") { // misal ID leave_type untuk 'sick' = 1
                 leaveToContainer.style.display = "none";
                 leaveToInput.value = leaveFromInput.value;
+                leaveDays.value = "0,5"
             } else {
                 leaveToContainer.style.display = "block";
             }
@@ -160,6 +171,65 @@
         leaveType.addEventListener("change", toggleLeaveTo);
     });
 </script>
+@endsection
 
+@section('scripts')
+<script>
+    function hitungHariKerja() {
+        const leaveType = document.getElementById("leave_type_id");
+        const fromInput = document.querySelector('input[name="leave_from"]');
+        const toInput = document.querySelector('input[name="leave_to"]');
+        const from = fromInput.value;
+        const to = toInput.value;
+
+        // Kosongkan nilai dulu
+        document.getElementById('leave_days').value = '';
+
+        if (!from) return;
+
+        if (leaveType.value === "10") {
+            toInput.value = from;
+            document.getElementById('leave_days').value = "0,5";
+            return;
+         }
+
+        if (from && to) {
+            const fromDate = new Date(from);
+            const toDate = new Date(to);
+
+            if (fromDate > toDate) {
+                console.warn("Tanggal mulai lebih besar dari tanggal selesai");
+                return;
+            }           
+
+            if (leaveType.value !== "10") {
+                fetch(`/api/hitung-hari-kerja?from=${from}&to=${to}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('leave_days').value = data.jumlah;
+                    })
+                    .catch(error => {
+                        console.error('Gagal hitung hari kerja:', error);
+                    });
+            } 
+        }
+    }
+
+    // Sinkronisasi tanggal & hitung saat "leave_from" diubah
+    document.querySelector('input[name="leave_from"]').addEventListener('change', function () {
+        const from = this.value;
+        const toInput = document.querySelector('input[name="leave_to"]');
+        
+        if (!toInput.value) {
+            toInput.value = from;
+        }
+
+        hitungHariKerja();
+    });
+
+    // Hitung ulang saat "leave_to" atau "leave_type" diubah
+    document.querySelector('input[name="leave_to"]').addEventListener('change', hitungHariKerja);
+    document.getElementById("leave_type_id").addEventListener('change', hitungHariKerja);
+</script>
 
 @endsection

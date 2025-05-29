@@ -41,7 +41,7 @@
                         <!-- $leavetype start -->
                         <div class="form-group mb-3">
                             <label for="">{{ __('Leave_Type:') }}</label>
-                            <select type="int" class="form-control @error('leave_type_id') is-invalid @enderror"
+                            <select type="int" id="leave_type_id" class="form-control @error('leave_type_id') is-invalid @enderror"
                                 name="leave_type_id" value="{{ old('leave_type_id') }}" required
                                 autocomplete="leave_type_id" autofocus>
                                 <option value="">--Select Leave_Type--</option>
@@ -120,55 +120,64 @@
 </div>
 
 @endsection
+
 @section('scripts')
 <script>
     function hitungHariKerja() {
-        const from = document.querySelector('input[name="leave_from"]').value;
-        const to = document.querySelector('input[name="leave_to"]').value;
+        const leaveType = document.getElementById("leave_type_id");
+        const fromInput = document.querySelector('input[name="leave_from"]');
+        const toInput = document.querySelector('input[name="leave_to"]');
+        const from = fromInput.value;
+        const to = toInput.value;
+
+        // Kosongkan nilai dulu
+        document.getElementById('leave_days').value = '';
+
+        if (!from) return;
+
+        if (leaveType.value === "10") {
+            toInput.value = from;
+            document.getElementById('leave_days').value = "0,5";
+            return;
+         }
 
         if (from && to) {
-            fetch(`/api/hitung-hari-kerja?from=${from}&to=${to}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('leave_days').value = data.jumlah;
-                })
-                .catch(error => {
-                    console.error('Gagal hitung hari kerja:', error);
-                });
+            const fromDate = new Date(from);
+            const toDate = new Date(to);
+
+            if (fromDate > toDate) {
+                console.warn("Tanggal mulai lebih besar dari tanggal selesai");
+                return;
+            }           
+
+            if (leaveType.value !== "10") {
+                fetch(`/api/hitung-hari-kerja?from=${from}&to=${to}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('leave_days').value = data.jumlah;
+                    })
+                    .catch(error => {
+                        console.error('Gagal hitung hari kerja:', error);
+                    });
+            } 
         }
     }
 
-    document.querySelector('input[name="leave_from"]').addEventListener('change', hitungHariKerja);
+    // Sinkronisasi tanggal & hitung saat "leave_from" diubah
+    document.querySelector('input[name="leave_from"]').addEventListener('change', function () {
+        const from = this.value;
+        const toInput = document.querySelector('input[name="leave_to"]');
+        
+        if (!toInput.value) {
+            toInput.value = from;
+        }
+
+        hitungHariKerja();
+    });
+
+    // Hitung ulang saat "leave_to" atau "leave_type" diubah
     document.querySelector('input[name="leave_to"]').addEventListener('change', hitungHariKerja);
+    document.getElementById("leave_type_id").addEventListener('change', hitungHariKerja);
 </script>
 
-<!-- <script>
-document.addEventListener('DOMContentLoaded', function() {
-    function hitungHariKerja() {
-        const from = document.querySelector('input[name="leave_from"]').value;
-        const to = document.querySelector('input[name="leave_to"]').value;
-
-        if (from && to) {
-            fetch(`/api/hitung-hari-kerja?from=${from}&to=${to}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('leave_days').value = data.jumlah;
-                })
-                .catch(error => {
-                    console.error('Gagal hitung hari kerja:', error);
-                });
-        }
-    }
-
-    const leaveFrom = document.querySelector('input[name="leave_from"]');
-    const leaveTo = document.querySelector('input[name="leave_to"]');
-
-    if(leaveFrom && leaveTo) {
-        leaveFrom.addEventListener('change', hitungHariKerja);
-        leaveTo.addEventListener('change', hitungHariKerja);
-    } else {
-        console.error('Input leave_from atau leave_to tidak ditemukan!');
-    }
-});
-</script> -->
 @endsection

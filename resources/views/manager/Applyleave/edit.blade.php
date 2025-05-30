@@ -82,7 +82,32 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-
+                            <div class="form-group col-6 mb-3" id="leave_to_container">
+                                <label for="leave_days">Days</label>
+                                <input type="text" id="leave_days" name="leave_days"
+                                    class="form-control @error('leave_days') is-invalid @enderror"
+                                    value="{{ $data->leave_days }}" readonly />
+                                @error('leave_days')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group col-6 mb-3 visually-hidden">
+                                <label for="handover_id">Select User to Hand Over:</label>
+                                <select id="handover_id" class="form-control @error('handover_id') is-invalid @enderror"
+                                    name="handover_id" autocomplete="handover_id" autofocus>
+                                    @if($users)
+                                        @foreach($users as $person)
+                                            <option value="{{ $person->id }}" 
+                                                {{ (old('handover_id') ?? ($data->handover_id ?? Auth::user()->id)) == $person->id ? 'selected' : '' }}>
+                                                {{ $person->name . ' ' . $person->last_name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('handover_id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                             <!-- Update Status -->
                             <div class="form-group col-4 mb-3">
                                 <label for="status">{{ __('Update Status:') }}</label>

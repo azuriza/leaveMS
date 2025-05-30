@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('leave:generate-balance')->yearlyOn(1, 1, '00:10'); // 1 Januari jam 00:10
     }
 
     /**

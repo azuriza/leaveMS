@@ -37,6 +37,6 @@ class LeaveBalance extends Model
             ? $this->carry_over
             : 0;
 
-        return ($this->jatah_cuti + $carryOver) - $this->cuti_terpakai;
+        return max(0, ($this->jatah_cuti + $carryOver) - $this->cuti_terpakai);
     }
 }

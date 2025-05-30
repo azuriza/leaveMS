@@ -44,6 +44,13 @@ class DashboardController extends Controller
         $users = User::where('role_as', '0')->count();
         $managers = User::where('role_as', '2')->count();
         $admins = User::where('role_as', '1')->count();
-        return view('Pages.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'managers', 'admins'));
+
+        $user = auth()->user();
+        $tahunIni = now()->year;
+
+        $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+        $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+
+        return view('Pages.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'managers', 'admins', 'sisaCuti'));
     }
 }

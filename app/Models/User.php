@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Department;
 use App\Models\Applyleave;
+use App\Models\leaveBalances;
 
 
 class User extends Authenticatable
@@ -33,6 +34,11 @@ class User extends Authenticatable
     public function isEmployee()
     {
         return $this->role_as === 0;
+    }
+
+    public function leaveBalances()
+    {
+        return $this->hasMany(LeaveBalance::class);
     }
     
     protected $table = 'users';

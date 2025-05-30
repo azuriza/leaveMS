@@ -123,7 +123,16 @@ class ApplyleaveController extends Controller
     {
         $users = User::all();
         $leavetype = Leavetype::all();
-        return view('manager.Applyleave.create', ['users' => $users], ['leavetype' => $leavetype]);
+        $user = auth()->user();
+        $tahunIni = now()->year;
+
+        $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+        $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+        return view('Pages.Applyleave.create', [
+            'users' => $users,
+            'leavetype' => $leavetype,
+            'sisaCuti' => $sisaCuti
+        ]);
     }
 
     public function registermanager(Request $request) 
@@ -133,8 +142,21 @@ class ApplyleaveController extends Controller
             'leave_type_id' => 'required',
             'description' => 'required',
             'leave_from' => 'required',
-            'leave_to' => 'required'
+            'leave_to' => 'required',
+            'handover_id' => 'required',
+            'leave_days' => 'required'
         ]);
+
+        $user = auth()->user();
+        $tahunIni = now()->year;
+
+        $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+        $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+
+         // Validasi logika sisa cuti
+        if ($sisaCuti < $request->input('leave_days')) {
+            return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+        }
 
         $data = new Applyleave;
         $data->user_id = $request->input('user_id');
@@ -142,15 +164,32 @@ class ApplyleaveController extends Controller
         $data->description = $request->input('description');
         $data->leave_from = $request->input('leave_from');
         $data->leave_to = $request->input('leave_to');
+        $data->handover_id = $request->input('handover_id');
+        $data->leave_days = $request->input('leave_days');
         $data->save();
+
+        $jumlahHari = $request->input('leave_days'); 
+
+        // 2. Update cuti_terpakai di leave_balances
+        $tahun = now()->year;
+
+        $balance = LeaveBalance::where('user_id', $request->user_id)
+            ->where('tahun', $tahun)
+            ->first();
+
+        if ($balance) {
+            $balance->increment('cuti_terpakai', $jumlahHari);
+        }
 
         return redirect('manager/applyleave')->with(['status' => 'Leave Applied Successfully', 'status_code' => 'success']);
     }    
 
     public function editmanager($id)
     {
+        $users = User::all();
         $data = Applyleave::find($id);
-        return view('manager.Applyleave.edit', compact('data'));
+        
+        return view('manager.Applyleave.edit', compact('data','users'));
     }  
 
     public function updatemanager(Request $request, $id)
@@ -159,7 +198,9 @@ class ApplyleaveController extends Controller
             'description' => 'required',
             'leave_from' => 'required',
             'leave_to' => 'required',
-            'status' => 'required'
+            'status' => 'required',
+            'handover_id' => 'required',
+            'leave_days' => 'required'
         ]);
 
         if ($validator->fails())
@@ -176,11 +217,45 @@ class ApplyleaveController extends Controller
            else
            {
             if ($data) {
+
+                $user = auth()->user();
+                $tahunIni = now()->year;
+
+                $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+                $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+
+                // Validasi logika sisa cuti
+                if ($sisaCuti < $request->input('leave_days')) {
+                    return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+                }
+
+                // 1. Hitung jumlah hari lama
+                $jumlahHariLama = $data->leave_days;
+                $jumlahHariBaru = $request->input('leave_days');
+
                 $data->description = $request->input('description');
                 $data->leave_from = $request->input('leave_from');
                 $data->leave_to = $request->input('leave_to');
                 $data->status = $request->input('status');
+                $data->handover_id = $request->input('handover_id');
+                $data->leave_days = $request->input('leave_days');
                 $data->update();
+
+                // 4. Hitung selisih dan update leave_balances
+                $selisih = $jumlahHariBaru - $jumlahHariLama;
+                $tahun = now()->year;
+
+                $balance = LeaveBalance::where('user_id', $data->user_id)
+                    ->where('tahun', $tahun)
+                    ->first();
+
+                if ($balance && $selisih !== 0) {
+                    if ($selisih > 0) {
+                        $balance->increment('cuti_terpakai', $selisih);
+                    } else {
+                        $balance->decrement('cuti_terpakai', abs($selisih));
+                    }
+                }
 
                 return redirect('manager/applyleave')->with(['status' => 'Updated Successfully', 'status_code' => 'success']);
             }
@@ -208,7 +283,19 @@ class ApplyleaveController extends Controller
                     ->where('role_as', 0)            
                     ->get();
         $leavetype = Leavetype::all();
-        return view('Pages.Applyleave.create', ['users' => $users], ['leavetype' => $leavetype]);
+
+        $user = auth()->user();
+        $tahunIni = now()->year;
+
+        $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+        $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+
+        return view('Pages.Applyleave.create', [
+            'users' => $users,
+            'leavetype' => $leavetype,
+            'sisaCuti' => $sisaCuti
+        ]);
+
     }
 
     public function store(Request $request) // store in frontend
@@ -222,6 +309,17 @@ class ApplyleaveController extends Controller
             'handover_id' => 'required',
             'leave_days' => 'required'
         ]);
+
+        $user = auth()->user();
+        $tahunIni = now()->year;
+
+        $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+        $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+
+         // Validasi logika sisa cuti
+        if ($sisaCuti < $request->input('leave_days')) {
+            return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+        }
 
         $data = new Applyleave;
         $data->user_id = $request->input('user_id');
@@ -261,7 +359,13 @@ class ApplyleaveController extends Controller
         $users = User::where('department_id', auth()->user()->department_id)
                     ->where('role_as', 0)            
                     ->get();
-        return view('Pages.Applyleave.edit', compact('data','users'));
+
+        $user = auth()->user();
+        $tahunIni = now()->year;
+
+        $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+        $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+        return view('Pages.Applyleave.edit', compact('data','users','sisaCuti'));
     }
 
     public function _update(Request $request, $id) // Update on the frontend
@@ -307,6 +411,17 @@ class ApplyleaveController extends Controller
                 else
                 if(($data->status) === 0)
                 {   
+                    $user = auth()->user();
+                    $tahunIni = now()->year;
+
+                    $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+                    $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+
+                    // Validasi logika sisa cuti
+                    if ($sisaCuti < $request->input('leave_days')) {
+                        return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+                    }
+
                     // 1. Hitung jumlah hari lama
                     $jumlahHariLama = $data->leave_days;
                     $jumlahHariBaru = $request->input('leave_days');

@@ -104,7 +104,7 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="form-group col-6 mb-3">
+                            <div class="form-group col-6 mb-3 visually-hidden">
                                 <label for="user_id">Select User to Hand Over:</label>
                                 <select type="int" class="form-control @error('user_id') is-invalid @enderror"
                                 name="user_id" value="{{ old('user_id') }}" required autocomplete="user_id" autofocus>

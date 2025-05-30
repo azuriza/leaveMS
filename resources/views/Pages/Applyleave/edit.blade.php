@@ -22,6 +22,12 @@
                     <form action="{{url('update/applyleave/' . $data->id)}}" method="POST">
                         @csrf
                         @method('PUT')
+                        <div class="form-group mb-3">
+                            <label for="sisa_cuti">Sisa Cuti Saat Ini:</label>
+                            <input type="text" id="sisa_cuti" name="sisa_cuti"
+                                class="form-control"
+                                value="{{ $sisaCuti ?? '0' }}" readonly>
+                        </div>
                         <!-- start User_id visually-hidden-->
                         <div class="form-group mb-3 visually-hidden">
                             <label for="">Select User:</label>

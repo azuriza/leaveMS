@@ -38,6 +38,12 @@
                             <!-- <input type="int" class="form-control rounded-pill" name="user_id" value="{{Auth::user()->id}}" required autofocus> -->
                         </div>
                         <!-- end -->
+                        <div class="form-group mb-3">
+                            <label for="sisa_cuti">Sisa Cuti Saat Ini:</label>
+                            <input type="text" id="sisa_cuti" name="sisa_cuti"
+                                class="form-control"
+                                value="{{ $sisaCuti ?? '0' }}" readonly>
+                        </div>
                         <!-- $leavetype start -->
                         <div class="form-group mb-3">
                             <label for="">{{ __('Leave_Type:') }}</label>

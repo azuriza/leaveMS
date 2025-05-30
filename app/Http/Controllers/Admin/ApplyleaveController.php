@@ -128,7 +128,7 @@ class ApplyleaveController extends Controller
 
         $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
         $sisaCuti = $balance ? $balance->sisa_cuti : 0;
-        return view('Pages.Applyleave.create', [
+        return view('manager.Applyleave.create', [
             'users' => $users,
             'leavetype' => $leavetype,
             'sisaCuti' => $sisaCuti

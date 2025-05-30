@@ -44,6 +44,13 @@ Route::get('/home', [HomeController::class, 'home'])->name('home');
 Route::get('/profile', [UserController::class, 'show'])->name('profile');
 Route::post('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
+Route::prefix('adminiso')->middleware(['auth', 'role:5'])->group(function () {
+  Route::get('/dashboard', [DashboardController::class, 'index'])->name('adminiso/dashboard');
+  Route::get('dokumen', [CategoryController::class, 'index']);
+  Route::get('add/dokumen', [CategoryController::class, 'create']);
+  Route::post('add_dokumen', [CategoryController::class, 'store']);
+});
+
 //Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () { 
 Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
   Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin/dashboard');

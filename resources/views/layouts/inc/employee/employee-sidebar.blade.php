@@ -21,20 +21,14 @@
                         <a class="nav-link {{ request()->is('show/applyleave') ? 'active' : '' }}" href="{{ url('show/applyleave')}}">View Leaves</a>
                     </nav>
                 </div>
-                <a class="nav-link collapsed {{ request()->is('admin/departments') || request()->is('admin/add/department') ? 'active' : '' }}"
-                    href="#" data-bs-toggle="collapse" data-bs-target="#isodocuments" aria-expanded="false"
-                    aria-controls="isodocuments">
-                    <div class="sb-nav-link-icon"><i class="fas fa-solid fa-folder-open"></i></div>
+                <a class="nav-link collapsed {{ request()->is('show/dokumen') ? 'active' : '' }}" href="#" data-bs-toggle="collapse" data-bs-target="#dokumens" aria-expanded="false" aria-controls="collapseLayouts">
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                     ISO Documents
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->is('admin/departments') || request()->is('admin/add/department') ? 'show' : '' }}"
-                    id="isodocuments" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                <div class="collapse {{ request()->is('show/dokumen') ? 'show' : '' }}" id="dokumens" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link {{ request()->is('admin/departments') ? 'active' : '' }}"
-                            href="{{ url('admin/departments')}}">Manual</a>
-                        <a class="nav-link {{ request()->is('admin/add/department') ? 'active' : '' }}"
-                            href="{{ url('admin/add/department')}}">Prosedur</a>
+                        <a class="nav-link {{ request()->is('show/dokumen') ? 'active' : '' }}" href="{{ url('show/dokumen')}}">View Documents</a>
                     </nav>
                 </div>
         </div>

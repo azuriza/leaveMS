@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LeavetypeController;
 use App\Http\Controllers\Admin\ApplyleaveController;
+use App\Http\Controllers\Admin\DokumenController;
 
 Route::get('/api/hitung-hari-kerja', function (\Illuminate\Http\Request $request) {
     $from = $request->query('from');
@@ -29,6 +30,7 @@ Route::post('add/applyleave', [ApplyleaveController::class, 'store']);
 Route::get('show/applyleave', [ApplyleaveController::class, 'show']);
 Route::get('edit/applyleave/{id}', [ApplyleaveController::class, '_edit']);
 Route::put('update/applyleave/{id}', [ApplyleaveController::class, '_update']);
+Route::get('show/dokumen', [DokumenController::class, 'show']);
 Route::get('/dashboard', [DashboardController::class, 'dashemployee']);
 
 Auth::routes();
@@ -45,10 +47,14 @@ Route::get('/profile', [UserController::class, 'show'])->name('profile');
 Route::post('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
 Route::prefix('adminiso')->middleware(['auth', 'role:5'])->group(function () {
-  Route::get('/dashboard', [DashboardController::class, 'index'])->name('adminiso/dashboard');
-  Route::get('dokumen', [CategoryController::class, 'index']);
-  Route::get('add/dokumen', [CategoryController::class, 'create']);
-  Route::post('add_dokumen', [CategoryController::class, 'store']);
+  Route::get('/dashboard', [DashboardController::class, 'dashiso'])->name('adminiso/dashboard');
+  Route::get('dokumen', [DokumenController::class, 'index']);
+  Route::get('add/dokumen', [DokumenController::class, 'create']);
+  Route::post('store/dokumen', [DokumenController::class, 'store']);
+  Route::get('edit/dokumen/{id}', [DokumenController::class, 'edit']);
+  Route::put('update/dokumen/{id}', [DokumenController::class, 'update']);
+  Route::delete('delete/dokumen/{id}', [DokumenController::class, 'delete']);
+  
 });
 
 //Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () { 

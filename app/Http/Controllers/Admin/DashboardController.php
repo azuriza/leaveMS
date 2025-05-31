@@ -22,6 +22,19 @@ class DashboardController extends Controller
         $admins = User::where('role_as', '1')->count();
         return view('admin.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'managers','admins'));
     }
+    public function dashiso()
+    {
+        $departments = Department::count();
+        $leavetypes = Leavetype::count();
+        $leaves = Applyleave::count();
+        $departmentOfLoggedInUser = Auth::user()->department_id;
+        $users = User::where('role_as', '0')
+                ->where('department_id', $departmentOfLoggedInUser)
+                ->count();
+        $managers = User::where('role_as', '2')->count();
+        $admins = User::where('role_as', '1')->count();
+        return view('adminiso.dashboard', compact('departments', 'leavetypes', 'leaves', 'users', 'managers', 'admins'));
+    }
     public function dashmanager()
     {
         $departments = Department::count();

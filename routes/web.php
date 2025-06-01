@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LeavetypeController;
 use App\Http\Controllers\Admin\ApplyleaveController;
 use App\Http\Controllers\Admin\DokumenController;
+use App\Http\Controllers\Admin\KategoriDokumenController;
 
 Route::get('/api/hitung-hari-kerja', function (\Illuminate\Http\Request $request) {
     $from = $request->query('from');
@@ -54,7 +55,13 @@ Route::prefix('adminiso')->middleware(['auth', 'role:5'])->group(function () {
   Route::get('edit/dokumen/{id}', [DokumenController::class, 'edit']);
   Route::put('update/dokumen/{id}', [DokumenController::class, 'update']);
   Route::delete('delete/dokumen/{id}', [DokumenController::class, 'delete']);
-  
+
+  Route::get('kategori', [KategoriDokumenController::class, 'index']);
+  Route::get('add/kategori', [KategoriDokumenController::class, 'create']);
+  Route::post('store/kategori', [KategoriDokumenController::class, 'store']);
+  Route::get('edit/kategori/{id}', [KategoriDokumenController::class, 'edit']);
+  Route::put('update/kategori/{id}', [KategoriDokumenController::class, 'update']);
+  Route::delete('delete/kategori/{id}', [KategoriDokumenController::class, 'delete']);
 });
 
 //Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () { 

@@ -7,5 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Dokumen extends Model
 {
-    use HasFactory;
+    public function kategori()
+    {
+        return $this->belongsTo(KategoriDokumen::class, 'kategori_id');
+    }
 }

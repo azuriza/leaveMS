@@ -22,7 +22,20 @@
                 <div class="card-body">
                     <form action="{{ url('adminiso/store/dokumen') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-
+                        <div class="form-group mb-3">
+                            <label for="kategori_id">Kategori Dokumen</label>
+                            <select name="kategori_id" class="form-control @error('kategori_id') is-invalid @enderror">
+                                <option value="">-- Pilih Kategori --</option>
+                                @foreach($kategoriList as $kategori)
+                                    <option value="{{ $kategori->id }}" {{ old('kategori_id', $dokumen->kategori_id ?? '') == $kategori->id ? 'selected' : '' }}>
+                                        {{ $kategori->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('kategori_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
                         <div class="form-group mb-3">
                             <label for="judul">Judul</label>
                             <input id="judul" type="text" name="judul"

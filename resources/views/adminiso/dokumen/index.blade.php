@@ -22,10 +22,25 @@
                     </h4>
                 </div>
                 <div class="card-body table-responsive">
+                    <form method="GET" action="{{ url()->current() }}" class="mb-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <select name="kategori_id" class="form-control" onchange="this.form.submit()">
+                                    <option value="">-- Semua Kategori --</option>
+                                    @foreach($kategoris as $kategori)
+                                        <option value="{{ $kategori->id }}" {{ request('kategori_id') == $kategori->id ? 'selected' : '' }}>
+                                            {{ $kategori->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </form>
                     <table id="mydataTable" class="table table-striped table-bordered" style="width:100%">
                         <thead>
                             <tr>
                                 <th>No.</th>
+                                <th>Kategori</th>
                                 <th>Judul</th>
                                 <th>Actions</th>
                             </tr>
@@ -34,8 +49,12 @@
                             @foreach($dokumens as $index => $empdata)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
+                                    <td>{{ $empdata->kategori->nama ?? '-' }}</td>
                                     <td>{{ $empdata->judul }}</td>
                                     <td>
+                                        <a href="{{ asset('storage/' . $empdata->file_path) }}" target="_blank" class="btn btn-info btn-sm">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <a href="{{ url('adminiso/edit/dokumen/' . $empdata->id) }}"
                                             class="btn btn-warning btn-sm">
                                             <i class="bi bi-pencil"></i>

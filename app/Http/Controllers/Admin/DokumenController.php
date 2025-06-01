@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Dokumen;
+use App\Models\KategoriDokumen;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,21 +11,47 @@ use Illuminate\Support\Facades\Storage;
 
 class DokumenController extends Controller
 {
-    public function show()
+    public function kategori()
     {
-        $dokumens = Dokumen::all();
-        return view('Pages.dokumen.show', compact('dokumens'));
+        return $this->belongsTo(KategoriDokumen::class, 'kategori_id');
     }
 
-    public function index()
+    public function show(Request $request)
     {
-        $dokumens = Dokumen::where('user_id', Auth::id())->get();
-        return view('adminiso.dokumen.index', compact('dokumens'));
+        $query = Dokumen::with('kategori');
+
+        if ($request->filled('kategori_id')) {
+            $query->where('kategori_id', $request->kategori_id);
+        }
+
+        $dokumens = $query->get();
+        $kategoris = KategoriDokumen::all();
+
+        return view('Pages.dokumen.show', compact('dokumens', 'kategoris'));
+        // $dokumens = Dokumen::with('kategori')->get();
+        // return view('Pages.dokumen.show', compact('dokumens'));
+    }
+
+    public function index(Request $request)
+    {
+        $query = Dokumen::with('kategori')->where('user_id', Auth::id());
+
+        if ($request->filled('kategori_id')) {
+            $query->where('kategori_id', $request->kategori_id);
+        }
+
+        $dokumens = $query->get();
+        $kategoris = KategoriDokumen::all();
+
+        return view('adminiso.dokumen.index', compact('dokumens', 'kategoris'));
+        // $dokumens = Dokumen::with('kategori')->where('user_id', Auth::id())->get();
+        // return view('adminiso.dokumen.index', compact('dokumens'));
     }
 
     public function create()
     {
-        return view('adminiso.dokumen.create');
+        $kategoriList = KategoriDokumen::all();
+        return view('adminiso.dokumen.create', compact('kategoriList'));
     }
 
     public function store(Request $request)
@@ -32,6 +59,7 @@ class DokumenController extends Controller
         $request->validate([
             'judul' => 'required|string',
             'file_path' => 'required|mimes:pdf|max:2048',
+            'kategori_id' => 'required|exists:kategori_dokumen,id',
         ]);
 
         $path = $request->file('file_path')->store('dokumen', 'public');
@@ -40,6 +68,7 @@ class DokumenController extends Controller
         $dokumen->judul = $request->input('judul');
         $dokumen->file_path = $path;
         $dokumen->user_id = Auth::id();
+        $dokumen->kategori_id = $request->kategori_id;
         $dokumen->save();
 
         return redirect('adminiso/dokumen')->with(['status' => 'Document Added Successfully', 'status_code' => 'success']);
@@ -47,8 +76,9 @@ class DokumenController extends Controller
 
     public function edit($id)
     {
-        $dokumen = Dokumen::find($id);
-        return view('adminiso.dokumen.edit', compact('dokumen'));
+        $dokumen = Dokumen::findOrFail($id);
+        $kategoriList = KategoriDokumen::all();
+        return view('adminiso.dokumen.edit', compact('dokumen','kategoriList'));
     }
 
     public function update(Request $request, $id)
@@ -56,6 +86,7 @@ class DokumenController extends Controller
         $request->validate([
             'judul' => 'required|string',
             'file_path' => 'nullable|mimes:pdf|max:2048',  // file_path boleh kosong saat update
+            'kategori_id' => 'required|exists:kategori_dokumen,id',
         ]);
 
         $dokumen = Dokumen::findOrFail($id);
@@ -73,7 +104,7 @@ class DokumenController extends Controller
             $path = $request->file('file_path')->store('dokumen', 'public');
             $dokumen->file_path = $path;
         }
-
+        $dokumen->kategori_id = $request->kategori_id;
         $dokumen->save();
 
         return redirect('adminiso/dokumen')->with(['status' => 'Document updated successfully', 'status_code' => 'success']);

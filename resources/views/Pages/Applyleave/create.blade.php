@@ -77,7 +77,7 @@
                         </div>
                         <!-- End -->
                         <!-- Leave_To_Start -->
-                        <div class="form-group mb-3">
+                        <div class="form-group mb-3" id="leave_to_container">
                             <label for="">{{ __('Leave_To:') }}</label>
                             <input type="date" class="form-control @error('leave_to') is-invalid @enderror"
                                 name="leave_to" value="{{ old('leave_to') }}" min=<?php echo date('Y-m-d'); ?> required
@@ -124,7 +124,39 @@
         </div>
     </div>
 </div>
+<!-- JS to hide Leave To -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const leaveType = document.getElementById("leave_type_id");
+        const leaveToContainer = document.getElementById("leave_to_container");
+        const leaveFromInput = document.getElementById("leave_from");
+        const leaveToInput = document.getElementById("leave_to");
+        const leaveDays = document.getElementById("leave_days");
 
+         // Otomatis isi Leave To saat Leave From dipilih
+        //  leaveFromInput.addEventListener("change", function () {
+        //     leaveToInput.value = leaveFromInput.value;
+        // });
+ 
+        function toggleLeaveTo() {
+            if (leaveType.value === "10") { // misal ID leave_type untuk 'sick' = 1
+                leaveToContainer.style.display = "none";
+                leaveToInput.value = leaveFromInput.value;
+                leaveDays.value = "0,5"
+            } else {
+                leaveToContainer.style.display = "block";
+            }
+        }
+
+       // Panggil saat halaman dimuat
+    //    if (leaveFromInput.value) {
+    //         leaveToInput.value = leaveFromInput.value;
+    //     }
+
+        // Call on change
+        leaveType.addEventListener("change", toggleLeaveTo);
+    });
+</script>
 @endsection
 
 @section('scripts')

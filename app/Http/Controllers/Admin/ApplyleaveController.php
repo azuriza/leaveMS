@@ -232,6 +232,8 @@ class ApplyleaveController extends Controller
                 // 1. Hitung jumlah hari lama
                 $jumlahHariLama = $data->leave_days;
                 $jumlahHariBaru = $request->input('leave_days');
+                $statuslama = $data->status;
+                $statusbaru = $request->input('status');
 
                 $data->description = $request->input('description');
                 $data->leave_from = $request->input('leave_from');
@@ -256,6 +258,14 @@ class ApplyleaveController extends Controller
                         $balance->decrement('cuti_terpakai', abs($selisih));
                     }
                 }
+
+                if ($statuslama !== 2 && $statusbaru === 2){
+                    $balance->decrement('cuti_terpakai', abs($jumlahHariBaru));    
+                }
+
+                if ($statuslama === 2 && ($statusbaru === 1 || $statusbaru === 0)) {
+                    $balance->increment('cuti_terpakai', $jumlahHariBaru);  
+                }              
 
                 return redirect('manager/applyleave')->with(['status' => 'Updated Successfully', 'status_code' => 'success']);
             }
@@ -344,7 +354,8 @@ class ApplyleaveController extends Controller
             $balance->increment('cuti_terpakai', $jumlahHari);
         }
 
-        return redirect('add/applyleave')->with(['status' => 'Leave Applied Successfully. You have 2 days to update your application', 'status_code' => 'success']);
+        // return redirect('add/applyleave')->with(['status' => 'Leave Applied Successfully. You have 2 days to update your application', 'status_code' => 'success']);
+        return redirect('add/applyleave')->with(['status' => 'Leave Applied Successfully.', 'status_code' => 'success']);
     }
     
     public function show()
@@ -385,79 +396,79 @@ class ApplyleaveController extends Controller
                                     
 
             $data = Applyleave::find($id);
-            // declaring  values.
-            $fdata = $data->created_at ;
-            $account_active_days = 2;
-    
-            // calculating the expiration date.
-            $account_expires = "{$fdata} + {$account_active_days} days";
-    
-            // creating objects from the two dates.
-            $origin = new DateTime($fdata);
-            $expire = new Datetime($account_expires);
-    
-            $today = new DateTime();
-         
-            if ($expire < $today)
-             {
-              return redirect('/')->with(['status' => 'Your update time has expired!', 'status_code' => 'error']);
-             }
-             else
-             {
-                if(($data->status) === 1)
-                {
-                    return redirect('show/applyleave')->with(['status' => 'Accepted! You cannot update anymore!', 'status_code' => 'error']);  
-                } 
-                else
-                if(($data->status) === 0)
-                {   
-                    $user = auth()->user();
-                    $tahunIni = now()->year;
+            if(($data->status) === 1)
+            {
+                return redirect('show/applyleave')->with(['status' => 'Accepted! You cannot update anymore!', 'status_code' => 'error']);  
+            } 
+            else
+            if(($data->status) === 0)
+            {   
+                $user = auth()->user();
+                $tahunIni = now()->year;
 
-                    $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
-                    $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+                $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+                $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-                    // Validasi logika sisa cuti
-                    if ($sisaCuti < $request->input('leave_days')) {
-                        return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
-                    }
+                // Validasi logika sisa cuti
+                if ($sisaCuti < $request->input('leave_days')) {
+                    return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+                }
 
-                    // 1. Hitung jumlah hari lama
-                    $jumlahHariLama = $data->leave_days;
-                    $jumlahHariBaru = $request->input('leave_days');
+                // 1. Hitung jumlah hari lama
+                $jumlahHariLama = $data->leave_days;
+                $jumlahHariBaru = $request->input('leave_days');
 
-                    if ($data) {
-                        $data->description = $request->input('description');
-                        $data->leave_from = $request->input('leave_from');
-                        $data->leave_to = $request->input('leave_to');
-                        $data->handover_id = $request->input('handover_id');
-                        $data->leave_days = $request->input('leave_days');
-                        $data->update();                        
-                    
-                    // 4. Hitung selisih dan update leave_balances
-                    $selisih = $jumlahHariBaru - $jumlahHariLama;
-                    $tahun = now()->year;
+                if ($data) {
+                    $data->description = $request->input('description');
+                    $data->leave_from = $request->input('leave_from');
+                    $data->leave_to = $request->input('leave_to');
+                    $data->handover_id = $request->input('handover_id');
+                    $data->leave_days = $request->input('leave_days');
+                    $data->update();                        
+                
+                // 4. Hitung selisih dan update leave_balances
+                $selisih = $jumlahHariBaru - $jumlahHariLama;
+                $tahun = now()->year;
 
-                    $balance = LeaveBalance::where('user_id', $data->user_id)
-                        ->where('tahun', $tahun)
-                        ->first();
+                $balance = LeaveBalance::where('user_id', $data->user_id)
+                    ->where('tahun', $tahun)
+                    ->first();
 
-                    if ($balance && $selisih !== 0) {
-                        if ($selisih > 0) {
-                            $balance->increment('cuti_terpakai', $selisih);
-                        } else {
-                            $balance->decrement('cuti_terpakai', abs($selisih));
-                        }
-                    }
-                                
-                        return redirect('show/applyleave')->with(['status' => 'Leave updated successfully and is being processed', 'status_code' => 'success']);
+                if ($balance && $selisih !== 0) {
+                    if ($selisih > 0) {
+                        $balance->increment('cuti_terpakai', $selisih);
                     } else {
-                        return redirect('add/applyleave')->with(['status' => 'error', 'message' => 'Technical error ocurred , contact administrator.']);
+                        $balance->decrement('cuti_terpakai', abs($selisih));
                     }
-               }
+                }
+                            
+                    return redirect('show/applyleave')->with(['status' => 'Leave updated successfully and is being processed', 'status_code' => 'success']);
+                } else {
+                    return redirect('add/applyleave')->with(['status' => 'error', 'message' => 'Technical error ocurred , contact administrator.']);
+                }
+            }
+
+            // //declaring  values.
+            // $fdata = $data->created_at ;
+            // $account_active_days = 2;
+    
+            // // calculating the expiration date.
+            // $account_expires = "{$fdata} + {$account_active_days} days";
+    
+            // // creating objects from the two dates.
+            // $origin = new DateTime($fdata);
+            // $expire = new Datetime($account_expires);
+    
+            // $today = new DateTime();
+         
+            // if ($expire < $today)
+            //  {
+            //   return redirect('/')->with(['status' => 'Your update time has expired!', 'status_code' => 'error']);
+            //  }
+            //  else
+            //  {
+                
            
-            }  
-        
-           
+            // }             
     }
 }

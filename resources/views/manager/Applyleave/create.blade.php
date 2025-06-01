@@ -19,9 +19,19 @@
                     </h4>
                 </div>
                 <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <form action="{{ url('manager/add/applyleave') }}" method="POST">
                         @csrf
                         <div class="row col-md-12 col-lg-12 col-xl-12">
+                            
                             <!-- Select User -->
                             <div class="form-group col-6 mb-3 visually-hidden">
                                 <label for="user_id">Select User:</label>
@@ -41,7 +51,12 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-
+                            <div class="form-group mb-3">
+                                <label for="sisa_cuti">Sisa Cuti Saat Ini:</label>
+                                <input type="text" id="sisa_cuti" name="sisa_cuti"
+                                    class="form-control"
+                                    value="{{ $sisaCuti ?? '0' }}" readonly>
+                            </div>
                             <!-- Leave Type -->
                             <div class="form-group col-6 mb-3">
                                 <label for="leave_type_id">{{ __('Leave Type:') }}</label>
@@ -73,7 +88,6 @@
                                 @enderror
                             </div>
 
-
                             <!-- Leave From -->
                             <div class="form-group col-6 mb-3">
                                 <label for="leave_from">{{ __('Leave From:') }}</label>
@@ -95,7 +109,7 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="form-group col-6 mb-3" id="leave_to_container">
+                            <div class="form-group col-6 mb-3" id="days">
                                 <label for="leave_days">Days</label>
                                 <input type="text" id="leave_days" name="leave_days"
                                     class="form-control @error('leave_days') is-invalid @enderror"
@@ -105,9 +119,9 @@
                                 @enderror
                             </div>
                             <div class="form-group col-6 mb-3 visually-hidden">
-                                <label for="user_id">Select User to Hand Over:</label>
-                                <select type="int" class="form-control @error('user_id') is-invalid @enderror"
-                                name="user_id" value="{{ old('user_id') }}" required autocomplete="user_id" autofocus>
+                                <label for="handover_id">Select User to Hand Over:</label>
+                                <select type="int" class="form-control @error('handover_id') is-invalid @enderror"
+                                name="handover_id" value="{{ old('handover_id') }}" required autocomplete="handover_id" autofocus>
 
                                 @if($users)
                                     @foreach($users as $person)
@@ -118,7 +132,7 @@
                                     @endforeach
                                 @endif
                                 </select>
-                                @error('user_id')
+                                @error('handover_id')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -163,9 +177,9 @@
         }
 
        // Panggil saat halaman dimuat
-       if (leaveFromInput.value) {
-            leaveToInput.value = leaveFromInput.value;
-        }
+    //    if (leaveFromInput.value) {
+    //         leaveToInput.value = leaveFromInput.value;
+    //     }
 
         // Call on change
         leaveType.addEventListener("change", toggleLeaveTo);

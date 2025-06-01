@@ -20,6 +20,15 @@
                     </h4>
                 </div>
                 <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <form action="{{ url('manager/update/applyleave/' . $data->id) }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -55,7 +64,7 @@
                                 <textarea id="description"
                                     class="form-control @error('description') is-invalid @enderror" name="description"
                                     placeholder="State the reason for Application!"
-                                    readonly>{{ $data->description }}</textarea>
+                                    @if($data->user_id != auth()->user()->id) readonly @endif>{{ $data->description }}</textarea>
                                 @error('description')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -66,27 +75,27 @@
                                 <label for="leave_from">{{ __('Leave From:') }}</label>
                                 <input id="leave_from" type="date"
                                     class="form-control @error('leave_from') is-invalid @enderror" name="leave_from"
-                                    value="{{ $data->leave_from }}" min="{{ date('Y-m-d') }}" readonly />
+                                    value="{{ $data->leave_from }}" min="{{ date('Y-m-d') }}" @if($data->user_id != auth()->user()->id) readonly @endif />
                                 @error('leave_from')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <!-- Leave To -->
-                            <div class="form-group col-6 mb-3">
+                            <div class="form-group col-6 mb-3" id="leave_to_container">
                                 <label for="leave_to">{{ __('Leave To:') }}</label>
                                 <input id="leave_to" type="date"
                                     class="form-control @error('leave_to') is-invalid @enderror" name="leave_to"
-                                    value="{{ $data->leave_to }}" min="{{ date('Y-m-d') }}" readonly />
+                                    value="{{ $data->leave_to }}" min="{{ date('Y-m-d') }}" @if($data->user_id != auth()->user()->id) readonly @endif />
                                 @error('leave_to')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="form-group col-6 mb-3" id="leave_to_container">
+                            <div class="form-group col-6 mb-3" id="leave_days">
                                 <label for="leave_days">Days</label>
                                 <input type="text" id="leave_days" name="leave_days"
                                     class="form-control @error('leave_days') is-invalid @enderror"
-                                    value="{{ $data->leave_days }}" readonly />
+                                    value="{{ $data->leave_days }}" @if($data->user_id != auth()->user()->id) readonly @endif/>
                                 @error('leave_days')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -119,6 +128,12 @@
                                     <option value="1" {{ $data->status == '1' ? 'selected' : '' }}>Accepted</option>
                                     <option value="2" {{ $data->status == '2' ? 'selected' : '' }}>Rejected</option>
                                 </select>
+                                {{-- ⬇️ Ini input tersembunyi untuk kirim datanya ke server --}}
+                                @if($data->user_id == auth()->user()->id)
+                                    <input type="hidden" name="status" value="{{ $data->status }}">
+                                @else
+                                    {{-- biarkan select aslinya yang terkirim --}}
+                                @endif
                                 @error('status')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -138,5 +153,100 @@
         </div>
     </div>
 </div>
+
+
+<!-- JS to hide Leave To -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const leaveType = document.getElementById("leave_type_id");
+        const leaveToContainer = document.getElementById("leave_to_container");
+        const leaveFromInput = document.getElementById("leave_from");
+        const leaveToInput = document.getElementById("leave_to");
+        const leaveDays = document.getElementById("leave_days");
+
+         // Otomatis isi Leave To saat Leave From dipilih
+        //  leaveFromInput.addEventListener("change", function () {
+        //     leaveToInput.value = leaveFromInput.value;
+        // });
+ 
+        function toggleLeaveTo() {
+            if (leaveType.value === "10") { // misal ID leave_type untuk 'sick' = 1
+                leaveToContainer.style.display = "none";
+                leaveToInput.value = leaveFromInput.value;
+                leaveDays.value = "0,5"
+            } else {
+                leaveToContainer.style.display = "block";
+            }
+        }
+
+       // Panggil saat halaman dimuat
+    //    if (leaveFromInput.value) {
+    //         leaveToInput.value = leaveFromInput.value;
+    //     }
+
+        // Call on change
+        leaveType.addEventListener("change", toggleLeaveTo);
+    });
+</script>
+@endsection
+
+@section('scripts')
+<script>
+    function hitungHariKerja() {
+        const leaveType = document.getElementById("leave_type_id");
+        const fromInput = document.querySelector('input[name="leave_from"]');
+        const toInput = document.querySelector('input[name="leave_to"]');
+        const from = fromInput.value;
+        const to = toInput.value;
+
+        // Kosongkan nilai dulu
+        document.getElementById('leave_days').value = '';
+
+        if (!from) return;
+
+        if (leaveType.value === "10") {
+            toInput.value = from;
+            document.getElementById('leave_days').value = "0,5";
+            return;
+         }
+
+        if (from && to) {
+            const fromDate = new Date(from);
+            const toDate = new Date(to);
+
+            if (fromDate > toDate) {
+                console.warn("Tanggal mulai lebih besar dari tanggal selesai");
+                return;
+            }           
+
+            if (leaveType.value !== "10") {
+                fetch(`/api/hitung-hari-kerja?from=${from}&to=${to}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('leave_days').value = data.jumlah;
+                    })
+                    .catch(error => {
+                        console.error('Gagal hitung hari kerja:', error);
+                    });
+            } 
+        }
+    }
+
+    // Sinkronisasi tanggal & hitung saat "leave_from" diubah
+    document.querySelector('input[name="leave_from"]').addEventListener('change', function () {
+        const from = this.value;
+        const toInput = document.querySelector('input[name="leave_to"]');
+        
+        if (!toInput.value) {
+            toInput.value = from;
+        }
+
+        hitungHariKerja();
+    });
+
+    // Hitung ulang saat "leave_to" atau "leave_type" diubah
+    document.querySelector('input[name="leave_to"]').addEventListener('change', hitungHariKerja);
+    document.getElementById("leave_type_id").addEventListener('change', hitungHariKerja);
+</script>
 
 @endsection

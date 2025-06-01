@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Department;
 use App\Models\Applyleave;
@@ -77,6 +78,19 @@ class User extends Authenticatable
         'created_at' => 'datetime',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            DB::insert('INSERT INTO leave_balances (user_id, tahun, jatah_cuti, carry_over, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', [
+                $user->id,
+                date('Y'),
+                12,  // jatah cuti default
+                0,   // carry over
+                now(),
+                now(),
+            ]);
+        });
+    }
 
 
 }

@@ -49,7 +49,10 @@
                                     <td>{{
                                             $item->role_as == '1' ? 'Admin' :
                                             ($item->role_as == '2' ? 'Manager' :
-                                            ($item->role_as == '0' ? 'Employee' : 'Unknown'))
+                                            ($item->role_as == '3' ? 'Direktur' :
+                                            ($item->role_as == '4' ? 'Admin HR' :
+                                            ($item->role_as == '5' ? 'Admin ISO' :
+                                            ($item->role_as == '0' ? 'Employee' : 'Unknown')))))
                                         }}</td>
                                     <td>
                                         <a href="{{ url('admin/user/' . $item->id . '/edit') }}" class="btn btn-warning btn-sm">

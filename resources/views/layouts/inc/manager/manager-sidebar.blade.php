@@ -9,7 +9,7 @@
                     Dashboard
                 </a>
                 <div class="sb-sidenav-menu-heading">Interface</div>
-                <a class="nav-link collapsed {{ request()->is('manager/add/leavetype') || request()->is('manager/leavetype') ? 'active' : '' }}"
+                <!-- <a class="nav-link collapsed {{ request()->is('manager/add/leavetype') || request()->is('manager/leavetype') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false"
                     aria-controls="collapseLayouts">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
@@ -24,7 +24,7 @@
                         <a class="nav-link {{ request()->is('manager/leavetype') ? 'active' : '' }}"
                             href="{{ url('manager/leavetype')}}">View Leave Type</a>
                     </nav>
-                </div>
+                </div> -->
 
                 <a class="nav-link collapsed {{ request()->is('manager/applyleave') || request()->is('manager/add/applyleave') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="false"

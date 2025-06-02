@@ -26,7 +26,7 @@
                     </nav>
                 </div>
 
-                <a class="nav-link collapsed {{ request()->is('admin/applyleave') || request()->is('admin/add/applyleave') ? 'active' : '' }}"
+                <!-- <a class="nav-link collapsed {{ request()->is('admin/applyleave') || request()->is('admin/add/applyleave') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="false"
                     aria-controls="collapseLayouts">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
@@ -41,7 +41,7 @@
                         <a class="nav-link {{ request()->is('admin/add/applyleave') ? 'active' : '' }}"
                             href="{{ url('admin/add/applyleave')}}">Apply Leave</a>
                     </nav>
-                </div>
+                </div> -->
                 <a class="nav-link collapsed {{ request()->is('admin/departments') || request()->is('admin/add/department') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#departments" aria-expanded="false"
                     aria-controls="departments">
@@ -58,7 +58,38 @@
                             href="{{ url('admin/add/department')}}">Add Department</a>
                     </nav>
                 </div>
-
+                <a class="nav-link collapsed {{ request()->is('admin/kategori') || request()->is('admin/add/kategori') ? 'active' : '' }}"
+                    href="#" data-bs-toggle="collapse" data-bs-target="#kategoridok" aria-expanded="false"
+                    aria-controls="kategoridok">
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                    Category Documents
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse {{ request()->is('admin/kategori') || request()->is('admin/add/kategori') ? 'show' : '' }}"
+                    id="kategoridok" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {{ request()->is('admin/kategori') ? 'active' : '' }}"
+                            href="{{ url('admin/kategori')}}">View Category</a>
+                        <a class="nav-link {{ request()->is('admin/add/kategori') ? 'active' : '' }}"
+                            href="{{ url('admin/add/kategori')}}">Add Category</a>
+                    </nav>
+                </div>              
+                <a class="nav-link collapsed {{ request()->is('admin/dokumen') || request()->is('admin/add/dokumen') ? 'active' : '' }}"
+                    href="#" data-bs-toggle="collapse" data-bs-target="#dokumens" aria-expanded="false"
+                    aria-controls="dokumens">
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                    Documents
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse {{ request()->is('admin/dokumen') || request()->is('admin/add/dokumen') ? 'show' : '' }}"
+                    id="dokumens" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {{ request()->is('admin/dokumen') ? 'active' : '' }}"
+                            href="{{ url('admin/dokumen')}}">View Documents</a>
+                        <a class="nav-link {{ request()->is('admin/add/dokumen') ? 'active' : '' }}"
+                            href="{{ url('admin/add/dokumen')}}">Add Documents</a>
+                    </nav>
+                </div>
                 <a class="nav-link collapsed {{ request()->is('admin/users') || request()->is('admin/add/user') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="false"
                     aria-controls="users">

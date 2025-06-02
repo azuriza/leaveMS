@@ -150,6 +150,9 @@
                                     <option value="0" {{ old('role_as', $user->role_as) == '0' ? 'selected' : '' }}>Employee</option>
                                     <option value="1" {{ old('role_as', $user->role_as) == '1' ? 'selected' : '' }}>Admin</option>
                                     <option value="2" {{ old('role_as', $user->role_as) == '2' ? 'selected' : '' }}>Manager</option>
+                                    <option value="3" {{ old('role_as', $user->role_as) == '3' ? 'selected' : '' }}>Direktur</option>
+                                    <option value="4" {{ old('role_as', $user->role_as) == '4' ? 'selected' : '' }}>Admin HR</option>
+                                    <option value="5" {{ old('role_as', $user->role_as) == '5' ? 'selected' : '' }}>Admin ISO</option>
                                 </select>
                                 @error('role_as')
                                     <span class="text-danger">{{ $message }}</span>

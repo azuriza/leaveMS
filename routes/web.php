@@ -105,6 +105,20 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
   Route::get('edit/department/{id}', [DepartmentController::class, 'edit']);
   Route::put('update/department/{id}', [DepartmentController::class, 'update']);
   Route::delete('delete/department/{id}', [DepartmentController::class, 'delete']);
+
+  Route::get('dokumen', [DokumenController::class, 'indexadmin']);
+  Route::get('add/dokumen', [DokumenController::class, 'createadmin']);
+  Route::post('store/dokumen', [DokumenController::class, 'storeadmin']);
+  Route::get('edit/dokumen/{id}', [DokumenController::class, 'editadmin']);
+  Route::put('update/dokumen/{id}', [DokumenController::class, 'updateadmin']);
+  Route::delete('delete/dokumen/{id}', [DokumenController::class, 'deleteadmin']);
+
+  Route::get('kategori', [KategoriDokumenController::class, 'indexadmin']);
+  Route::get('add/kategori', [KategoriDokumenController::class, 'createadmin']);
+  Route::post('store/kategori', [KategoriDokumenController::class, 'storeadmin']);
+  Route::get('edit/kategori/{id}', [KategoriDokumenController::class, 'editadmin']);
+  Route::put('update/kategori/{id}', [KategoriDokumenController::class, 'updateadmin']);
+  Route::delete('delete/kategori/{id}', [KategoriDokumenController::class, 'deleteadmin']);
 });
 
 Route::prefix('manager')->middleware(['auth', 'role:2'])->group(function () {

@@ -11,7 +11,7 @@
                 <a class="nav-link collapsed {{ request()->is('adminiso/kategori') || request()->is('adminiso/add/kategori') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#kategoridok" aria-expanded="false"
                     aria-controls="kategoridok">
-                    <div class="sb-nav-link-icon"><i class="fa fa-user fa-fw"></i></div>
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                     Category Documents
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
@@ -27,7 +27,7 @@
                 <a class="nav-link collapsed {{ request()->is('adminiso/dokumen') || request()->is('adminiso/add/dokumen') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#dokumens" aria-expanded="false"
                     aria-controls="dokumens">
-                    <div class="sb-nav-link-icon"><i class="fa fa-user fa-fw"></i></div>
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                     Documents
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>

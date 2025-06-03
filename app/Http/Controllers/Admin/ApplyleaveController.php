@@ -144,18 +144,25 @@ class ApplyleaveController extends Controller
             'leave_from' => 'required',
             'leave_to' => 'required',
             'handover_id' => 'required',
-            'leave_days' => 'required'
+            'handover_id_2' => 'nullable',
+            'handover_id_3' => 'nullable',
+            'leave_days' => 'required',
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'reason' => 'required'
         ]);
 
         $user = auth()->user();
         $tahunIni = now()->year;
+        $leavetype = $request->input('leave_type_id');
 
         $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
         $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-         // Validasi logika sisa cuti
-        if ($sisaCuti < $request->input('leave_days')) {
-            return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+        if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+            // Validasi logika sisa cuti
+            if ($sisaCuti < $request->input('leave_days')) {
+                return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+            }
         }
 
         $data = new Applyleave;
@@ -164,21 +171,26 @@ class ApplyleaveController extends Controller
         $data->description = $request->input('description');
         $data->leave_from = $request->input('leave_from');
         $data->leave_to = $request->input('leave_to');
-        $data->handover_id = $request->input('handover_id');
+        $data->handover_id_2 = $request->input('handover_id_2');
+        $data->handover_id_3 = $request->input('handover_id_3');
         $data->leave_days = $request->input('leave_days');
+        $data->file_path = $path;
+        $data->reason = $request->input('reason');
         $data->save();
 
-        $jumlahHari = $request->input('leave_days'); 
+        if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+            $jumlahHari = $request->input('leave_days'); 
 
-        // 2. Update cuti_terpakai di leave_balances
-        $tahun = now()->year;
+            // 2. Update cuti_terpakai di leave_balances
+            $tahun = now()->year;
 
-        $balance = LeaveBalance::where('user_id', $request->user_id)
-            ->where('tahun', $tahun)
-            ->first();
+            $balance = LeaveBalance::where('user_id', $request->user_id)
+                ->where('tahun', $tahun)
+                ->first();
 
-        if ($balance) {
-            $balance->increment('cuti_terpakai', $jumlahHari);
+            if ($balance) {
+                $balance->increment('cuti_terpakai', $jumlahHari);
+            }
         }
 
         return redirect('manager/applyleave')->with(['status' => 'Leave Applied Successfully', 'status_code' => 'success']);
@@ -200,7 +212,11 @@ class ApplyleaveController extends Controller
             'leave_to' => 'required',
             'status' => 'required',
             'handover_id' => 'required',
-            'leave_days' => 'required'
+            'handover_id_2' => 'nullable',
+            'handover_id_3' => 'nullable',
+            'leave_days' => 'required',
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'reason' => 'required'
         ]);
 
         if ($validator->fails())
@@ -220,13 +236,16 @@ class ApplyleaveController extends Controller
 
                 $user = auth()->user();
                 $tahunIni = now()->year;
+                $leavetype = $request->input('leave_type_id');
 
                 $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
                 $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-                // Validasi logika sisa cuti
-                if ($sisaCuti < $request->input('leave_days')) {
-                    return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+                    // Validasi logika sisa cuti
+                    if ($sisaCuti < $request->input('leave_days')) {
+                        return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+                    }
                 }
 
                 // 1. Hitung jumlah hari lama
@@ -240,32 +259,49 @@ class ApplyleaveController extends Controller
                 $data->leave_to = $request->input('leave_to');
                 $data->status = $request->input('status');
                 $data->handover_id = $request->input('handover_id');
+                $data->handover_id_2 = $request->input('handover_id_2');
+                $data->handover_id_3 = $request->input('handover_id_3');
                 $data->leave_days = $request->input('leave_days');
+
+                // Cek jika ada file baru diupload
+                if ($request->hasFile('file_path')) {
+                    // Hapus file lama jika ada
+                    if ($data->file_path && \Storage::disk('public')->exists($data->file_path)) {
+                        \Storage::disk('public')->delete($data->file_path);
+                    }
+
+                    // Simpan file baru
+                    $path = $request->file('file_path')->store('dokumencuti', 'public');
+                    $data->file_path = $path;
+                }
+                $data->reason = $request->input('reason');
                 $data->update();
 
-                // 4. Hitung selisih dan update leave_balances
-                $selisih = $jumlahHariBaru - $jumlahHariLama;
-                $tahun = now()->year;
+                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate 
+                    // 4. Hitung selisih dan update leave_balances
+                    $selisih = $jumlahHariBaru - $jumlahHariLama;
+                    $tahun = now()->year;
 
-                $balance = LeaveBalance::where('user_id', $data->user_id)
-                    ->where('tahun', $tahun)
-                    ->first();
+                    $balance = LeaveBalance::where('user_id', $data->user_id)
+                        ->where('tahun', $tahun)
+                        ->first();
 
-                if ($balance && $selisih !== 0) {
-                    if ($selisih > 0) {
-                        $balance->increment('cuti_terpakai', $selisih);
-                    } else {
-                        $balance->decrement('cuti_terpakai', abs($selisih));
+                    if ($balance && $selisih !== 0) {
+                        if ($selisih > 0) {
+                            $balance->increment('cuti_terpakai', $selisih);
+                        } else {
+                            $balance->decrement('cuti_terpakai', abs($selisih));
+                        }
                     }
-                }
 
-                if ($statuslama !== 2 && $statusbaru === 2){
-                    $balance->decrement('cuti_terpakai', abs($jumlahHariBaru));    
-                }
+                    if ($statuslama !== 2 && $statusbaru === 2){
+                        $balance->decrement('cuti_terpakai', abs($jumlahHariBaru));    
+                    }
 
-                if ($statuslama === 2 && ($statusbaru === 1 || $statusbaru === 0)) {
-                    $balance->increment('cuti_terpakai', $jumlahHariBaru);  
-                }              
+                    if ($statuslama === 2 && ($statusbaru === 1 || $statusbaru === 0)) {
+                        $balance->increment('cuti_terpakai', $jumlahHariBaru);  
+                    }  
+                }            
 
                 return redirect('manager/applyleave')->with(['status' => 'Updated Successfully', 'status_code' => 'success']);
             }
@@ -282,8 +318,6 @@ class ApplyleaveController extends Controller
         $data->delete();
         return redirect('manager/applyleave')->with(['status' => 'Deleted Successfully', 'status_code' => 'success']);
     }
-
-
 
     //implementation employee
     public function create() // applies on fronted
@@ -317,19 +351,28 @@ class ApplyleaveController extends Controller
             'leave_from' => 'required',
             'leave_to' => 'required',
             'handover_id' => 'required',
-            'leave_days' => 'required'
+            'handover_id_2' => 'nullable',
+            'handover_id_3' => 'nullable',
+            'leave_days' => 'required',
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'reason' => 'required'
         ]);
 
         $user = auth()->user();
         $tahunIni = now()->year;
+        $leavetype = $request->input('leave_type_id');
 
         $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
         $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
          // Validasi logika sisa cuti
-        if ($sisaCuti < $request->input('leave_days')) {
-            return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+        if ($leavetype !== '8' && $leavetype !== '9') {
+            if ($sisaCuti < $request->input('leave_days')) {
+                return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
+            }
         }
+
+        $path = $request->file('file_path')->store('dokumencuti', 'public');
 
         $data = new Applyleave;
         $data->user_id = $request->input('user_id');
@@ -338,20 +381,26 @@ class ApplyleaveController extends Controller
         $data->leave_from = $request->input('leave_from');
         $data->leave_to = $request->input('leave_to');
         $data->handover_id = $request->input('handover_id');
+        $data->handover_id_2 = $request->input('handover_id_2');
+        $data->handover_id_3 = $request->input('handover_id_3');
         $data->leave_days = $request->input('leave_days');
+        $data->file_path = $path;
+        $data->reason = $request->input('reason');
         $data->save();
 
-        //$jumlahHari = DateHelper::getWorkdays($request->input('leave_from'), $request->input('leave_to'));
-        $jumlahHari = $request->input('leave_days'); 
+        if ($leavetype !== '8' && $leavetype !== '9') {
+            //$jumlahHari = DateHelper::getWorkdays($request->input('leave_from'), $request->input('leave_to'));
+            $jumlahHari = $request->input('leave_days'); 
 
-        // 2. Update cuti_terpakai di leave_balances
-        $tahun = now()->year;
-        $balance = LeaveBalance::where('user_id', $request->user_id)
-            ->where('tahun', $tahun)
-            ->first();
+            // 2. Update cuti_terpakai di leave_balances
+            $tahun = now()->year;
+            $balance = LeaveBalance::where('user_id', $request->user_id)
+                ->where('tahun', $tahun)
+                ->first();
 
-        if ($balance) {
-            $balance->increment('cuti_terpakai', $jumlahHari);
+            if ($balance) {
+                $balance->increment('cuti_terpakai', $jumlahHari);
+            }
         }
 
         // return redirect('add/applyleave')->with(['status' => 'Leave Applied Successfully. You have 2 days to update your application', 'status_code' => 'success']);
@@ -386,67 +435,90 @@ class ApplyleaveController extends Controller
             'leave_from' => 'required',
             'leave_to' => 'required',
             'handover_id' => 'required',
-            'leave_days' => 'required'
+            'handover_id_2' => 'nullable',
+            'handover_id_3' => 'nullable',
+            'leave_days' => 'required',
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'reason' => 'required'
         ]);
-
+        
         if ($validator->fails()) {
             $errors = implode(" ", $validator->errors()->all());
             return response(['status' => 'error', 'message' => $errors]);
-        }
-                                    
+        }                                    
 
-            $data = Applyleave::find($id);
-            if(($data->status) === 1)
-            {
-                return redirect('show/applyleave')->with(['status' => 'Accepted! You cannot update anymore!', 'status_code' => 'error']);  
-            } 
-            else
-            if(($data->status) === 0)
-            {   
-                $user = auth()->user();
-                $tahunIni = now()->year;
+        $data = Applyleave::find($id);
+        if(($data->status) === 1)
+        {
+            return redirect('show/applyleave')->with(['status' => 'Accepted! You cannot update anymore!', 'status_code' => 'error']);  
+        } 
+        else
+        if(($data->status) === 0)
+        {   
+            $user = auth()->user();
+            $tahunIni = now()->year;
+            $leavetype = $request->input('leave_type_id');
 
-                $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
-                $sisaCuti = $balance ? $balance->sisa_cuti : 0;
+            $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
+            $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
+            if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
                 // Validasi logika sisa cuti
                 if ($sisaCuti < $request->input('leave_days')) {
                     return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
                 }
+            }
 
-                // 1. Hitung jumlah hari lama
-                $jumlahHariLama = $data->leave_days;
-                $jumlahHariBaru = $request->input('leave_days');
+            // 1. Hitung jumlah hari lama
+            $jumlahHariLama = $data->leave_days;
+            $jumlahHariBaru = $request->input('leave_days');
 
-                if ($data) {
-                    $data->description = $request->input('description');
-                    $data->leave_from = $request->input('leave_from');
-                    $data->leave_to = $request->input('leave_to');
-                    $data->handover_id = $request->input('handover_id');
-                    $data->leave_days = $request->input('leave_days');
-                    $data->update();                        
+            if ($data) {
+                $data->description = $request->input('description');
+                $data->leave_from = $request->input('leave_from');
+                $data->leave_to = $request->input('leave_to');
+                $data->handover_id = $request->input('handover_id');
+                $data->handover_id_2 = $request->input('handover_id_2');
+                $data->handover_id_3 = $request->input('handover_id_3');
+                $data->leave_days = $request->input('leave_days');
                 
-                // 4. Hitung selisih dan update leave_balances
-                $selisih = $jumlahHariBaru - $jumlahHariLama;
-                $tahun = now()->year;
+                // Cek jika ada file baru diupload
+                if ($request->hasFile('file_path')) {
+                    // Hapus file lama jika ada
+                    if ($data->file_path && \Storage::disk('public')->exists($data->file_path)) {
+                        \Storage::disk('public')->delete($data->file_path);
+                    }
 
-                $balance = LeaveBalance::where('user_id', $data->user_id)
-                    ->where('tahun', $tahun)
-                    ->first();
+                    // Simpan file baru
+                    $path = $request->file('file_path')->store('dokumencuti', 'public');
+                    $data->file_path = $path;
+                }
+                $data->reason = $request->input('reason');
+                $data->update(); 
+                
+                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate            
+                    // 4. Hitung selisih dan update leave_balances
+                    $selisih = $jumlahHariBaru - $jumlahHariLama;
+                    $tahun = now()->year;
 
-                if ($balance && $selisih !== 0) {
-                    if ($selisih > 0) {
-                        $balance->increment('cuti_terpakai', $selisih);
-                    } else {
-                        $balance->decrement('cuti_terpakai', abs($selisih));
+                    $balance = LeaveBalance::where('user_id', $data->user_id)
+                        ->where('tahun', $tahun)
+                        ->first();
+
+                    if ($balance && $selisih !== 0) {
+                        if ($selisih > 0) {
+                            $balance->increment('cuti_terpakai', $selisih);
+                        } else {
+                            $balance->decrement('cuti_terpakai', abs($selisih));
+                        }
                     }
                 }
-                            
-                    return redirect('show/applyleave')->with(['status' => 'Leave updated successfully and is being processed', 'status_code' => 'success']);
-                } else {
-                    return redirect('add/applyleave')->with(['status' => 'error', 'message' => 'Technical error ocurred , contact administrator.']);
-                }
+                        
+                return redirect('show/applyleave')->with(['status' => 'Leave updated successfully and is being processed', 'status_code' => 'success']);
+            } else {
+                return redirect('add/applyleave')->with(['status' => 'error', 'message' => 'Technical error ocurred , contact administrator.']);
             }
+        }
 
             // //declaring  values.
             // $fdata = $data->created_at ;

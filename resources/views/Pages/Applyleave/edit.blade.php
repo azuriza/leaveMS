@@ -35,12 +35,14 @@
                                 value="{{$data->user_id}}" required autocomplete="user_id" autofocus>
                         </div>
                         <!-- end -->
-                        <!-- $leavetype start -->
+                        <!-- $leavetype start -->                        
                         <div class="form-group mb-3">
                             <label for="">{{ __('Leave_Type:') }}</label>
-                            <input type="int" class="form-control @error('leave_type_id') is-invalid @enderror"
+                            <input type="hidden" id="leave_type_id" value="{{ $data->leave_type_id }}">
+                            <input type="text" class="form-control" value="{{ $data->leavetype->leave_type }}" readonly>
+                            <!-- <input type="int" class="form-control @error('leave_type_id') is-invalid @enderror"
                                 name="leave_type_id" value="{{$data->leavetype->leave_type}}" required
-                                autocomplete="leave_type_id" autofocus readonly>
+                                autocomplete="leave_type_id" autofocus readonly> -->
                         </div>
                         <!-- end -->
                         <!-- start Description -->
@@ -52,6 +54,21 @@
                                 autofocus>{{$data->description}}</textarea>
                         </div>
                         <!-- end I removed id="mysummernote" on description -->
+                        <div class="form-group mb-3" id="document_container" style="display: none;">
+                            <div class="form-group mb-3">
+                                <label>Dokumen Pendukung Saat Ini:</label><br>
+                                <a href="{{ asset('storage/' . $data->file_path) }}" target="_blank">Lihat File</a>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="file_path">Ganti Dokumen Pendukung (Opsional)</label>
+                                <input id="file_path" type="file" name="file_path" accept="application/pdf,image/jpeg,image/png"
+                                    class="form-control @error('file_path') is-invalid @enderror">
+                                @error('file_path')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
                         <!-- Leave_From_Start -->
                         <div class="form-group mb-3">
                             <label for="">{{ __('Leave_From:') }}</label>
@@ -76,7 +93,7 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="form-group col-6 mb-3">
+                        <div class="form-group col-6 mb-3" id="handover_container">
                             <label for="handover_id">Select User to Hand Over:</label>
                             <select id="handover_id" class="form-control @error('handover_id') is-invalid @enderror"
                                 name="handover_id" autocomplete="handover_id" autofocus>
@@ -90,6 +107,46 @@
                                 @endif
                             </select>
                             @error('handover_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group col-6 mb-3" id="handover2_container">
+                            <label for="handover_id_2">Select User to Hand Over 2 (Optional):</label>
+                            <select id="handover_id_2" class="form-control @error('handover_id_2') is-invalid @enderror"
+                                name="handover_id_2" autocomplete="handover_id_2" autofocus>
+                                
+                                <option value="">-- Pilih User --</option> {{-- opsi kosong --}}
+
+                                @if($users)
+                                    @foreach($users as $person)
+                                        <option value="{{ $person->id }}" 
+                                            {{ (old('handover_id_2') ?? $data->handover_id_2) == $person->id ? 'selected' : '' }}>
+                                            {{ $person->name . ' ' . $person->last_name }}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @error('handover_id_2')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group col-6 mb-3" id="handover3_container">
+                            <label for="handover_id_3">Select User to Hand Over 3 (Optional):</label>
+                            <select id="handover_id_3" class="form-control @error('handover_id_3') is-invalid @enderror"
+                                name="handover_id_3" autocomplete="handover_id_3" autofocus>
+                                
+                                <option value="">-- Pilih User --</option> {{-- opsi kosong --}}
+
+                                @if($users)
+                                    @foreach($users as $person)
+                                        <option value="{{ $person->id }}" 
+                                            {{ (old('handover_id_3') ?? $data->handover_id_3) == $person->id ? 'selected' : '' }}>
+                                            {{ $person->name . ' ' . $person->last_name }}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @error('handover_id_3')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -122,34 +179,30 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const leaveType = document.getElementById("leave_type_id");
-        const leaveToContainer = document.getElementById("leave_to_container");
-        const leaveFromInput = document.getElementById("leave_from");
-        const leaveToInput = document.getElementById("leave_to");
-        const leaveDays = document.getElementById("leave_days");
+        const documentContainer = document.getElementById("document_container");
+        const handover_container = document.getElementById("handover_container");
+        const handover2_container = document.getElementById("handover2_container");
+        const handover3_container = document.getElementById("handover3_container");
 
-         // Otomatis isi Leave To saat Leave From dipilih
-        //  leaveFromInput.addEventListener("change", function () {
-        //     leaveToInput.value = leaveFromInput.value;
-        // });
- 
-        function toggleLeaveTo() {
-            if (leaveType.value === "10") { // misal ID leave_type untuk 'sick' = 1
-                leaveToContainer.style.display = "none";
-                leaveToInput.value = leaveFromInput.value;
-                leaveDays.value = "0,5"
-            } else {
-                leaveToContainer.style.display = "block";
+        function toggleDocumentContainer() {
+            if (leaveType && documentContainer) {
+                const typeVal = leaveType.value.trim(); // pastikan tidak ada spasi
+                if (typeVal === "8" || typeVal === "9") {
+                    documentContainer.style.display = "block";
+                    handover_container.style.display = "none";
+                    handover2_container.style.display = "none";
+                    handover3_container.style.display = "none";
+                } else {
+                    documentContainer.style.display = "none";
+                    handover_container.style.display = "block";
+                    handover2_container.style.display = "block";
+                    handover3_container.style.display = "block";
+                }
             }
         }
 
-       // Panggil saat halaman dimuat
-    //    if (leaveFromInput.value) {
-    //         leaveToInput.value = leaveFromInput.value;
-    //     }
-
-        // Call on change
-        leaveType.addEventListener("change", toggleLeaveTo);
-    });
+        toggleDocumentContainer(); // panggil saat halaman dimuat
+    });   
 </script>
 @endsection
 

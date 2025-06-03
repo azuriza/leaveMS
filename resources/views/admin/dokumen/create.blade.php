@@ -66,4 +66,17 @@
         </div>
     </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('file_path').addEventListener('change', function() {
+        const allowedTypes = ['application/pdf'];
+        const file = this.files[0];
+
+        if (file && !allowedTypes.includes(file.type)) {
+            alert('Hanya file PDF yang diperbolehkan.');
+            this.value = '';
+        }
+    });
+  });
+</script>
 @endsection

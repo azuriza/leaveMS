@@ -87,7 +87,14 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-
+                            <div class="form-group mb-3" id="file_path_container" style="display: none;">
+                                <label for="file_path">Upload Dokumen Pendukung:</label>
+                                <input id="file_path" type="file" name="file_path" accept="application/pdf,image/jpeg,image/png" class="form-control @error('file_path') is-invalid @enderror" value="{{ old('file_path') }}"
+                                    autofocus />
+                                @error('file_path')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                             <!-- Leave From -->
                             <div class="form-group col-6 mb-3">
                                 <label for="leave_from">{{ __('Leave From:') }}</label>
@@ -118,7 +125,7 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div class="form-group col-6 mb-3 visually-hidden">
+                            <div class="form-group col-6 mb-3 visually-hidden" id="handover_container">
                                 <label for="handover_id">Select User to Hand Over:</label>
                                 <select type="int" class="form-control @error('handover_id') is-invalid @enderror"
                                 name="handover_id" value="{{ old('handover_id') }}" required autocomplete="handover_id" autofocus>
@@ -133,6 +140,46 @@
                                 @endif
                                 </select>
                                 @error('handover_id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group mb-3 visually-hidden" id="handover2_container">
+                                <label for="handover_id_2">Select User to Hand Over 2 (Optional):</label>
+                                <select class="form-control @error('handover_id_2') is-invalid @enderror"
+                                    name="handover_id_2" autocomplete="handover_id_2" autofocus>
+                                    
+                                    <option value="">-- Pilih User --</option> {{-- Tambahkan ini --}}
+                                    
+                                    @if($users)
+                                        @foreach($users as $person)
+                                            <option value="{{ $person->id }}" 
+                                                {{ old('handover_id_2') == $person->id ? 'selected' : '' }}>
+                                                {{ $person->name . ' ' . $person->last_name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('handover_id_2')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group mb-3 visually-hidden" id="handover3_container">
+                                <label for="handover_id_3">Select User to Hand Over 3 (Optional):</label>
+                                <select class="form-control @error('handover_id_3') is-invalid @enderror"
+                                    name="handover_id_3" autocomplete="handover_id_3" autofocus>
+                                    
+                                    <option value="">-- Pilih User --</option> {{-- Tambahkan ini --}}
+                                    
+                                    @if($users)
+                                        @foreach($users as $person)
+                                            <option value="{{ $person->id }}" 
+                                                {{ old('handover_id_3') == $person->id ? 'selected' : '' }}>
+                                                {{ $person->name . ' ' . $person->last_name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('handover_id_3')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -160,12 +207,25 @@
         const leaveFromInput = document.getElementById("leave_from");
         const leaveToInput = document.getElementById("leave_to");
         const leaveDays = document.getElementById("leave_days");
+        const file_path_container = document.getElementById("file_path_container");
+        const handover2_container = document.getElementById("handover2_container");
+        const handover3_container = document.getElementById("handover3_container");
 
-         // Otomatis isi Leave To saat Leave From dipilih
-        //  leaveFromInput.addEventListener("change", function () {
-        //     leaveToInput.value = leaveFromInput.value;
-        // });
+        // === Validasi file ===
+        const fileInput = document.getElementById("file_path");
+        if (fileInput) {
+            fileInput.addEventListener("change", function () {
+                const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+                const file = this.files[0];
+
+                if (file && !allowedTypes.includes(file.type)) {
+                    alert("Hanya file PDF, JPG, dan PNG yang diperbolehkan.");
+                    this.value = ""; // reset input
+                }
+            });
+        }
  
+        // === Logika cuti ===
         function toggleLeaveTo() {
             if (leaveType.value === "10") { // misal ID leave_type untuk 'sick' = 1
                 leaveToContainer.style.display = "none";
@@ -174,12 +234,20 @@
             } else {
                 leaveToContainer.style.display = "block";
             }
+            
+            // Tampilkan/sembunyikan file_path_container jika leaveType = 8 atau 9
+            if (leaveType.value === "8" || leaveType.value === "9") {
+                file_path_container.style.display = "block";
+                handover_container.style.display = "none";
+                handover2_container.style.display = "none";
+                handover3_container.style.display = "none";
+            } else {
+                file_path_container.style.display = "none";
+                handover_container.style.display = "block";
+                handover2_container.style.display = "block";
+                handover3_container.style.display = "block";
+            }
         }
-
-       // Panggil saat halaman dimuat
-    //    if (leaveFromInput.value) {
-    //         leaveToInput.value = leaveFromInput.value;
-    //     }
 
         // Call on change
         leaveType.addEventListener("change", toggleLeaveTo);

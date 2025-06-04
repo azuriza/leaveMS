@@ -19,7 +19,7 @@
                             @endforeach
                         </div>
                     @endif
-                    <form action="{{url('update/applyleave/' . $data->id)}}" method="POST">
+                    <form action="{{url('update/applyleave/' . $data->id)}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="form-group mb-3">

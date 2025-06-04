@@ -14,7 +14,7 @@
       <div class="card shadow">
         <div class="card-header">
           <h4>Applied Leaves
-            <!-- <a href="{{url('manager/add/applyleave')}}" class="btn btn-primary btn-sm float-end">Apply Leave</a> -->
+            <a href="{{url('manager/add/applyleave')}}" class="btn btn-primary btn-sm float-end">Apply Leave</a>
           </h4>
         </div>
         <div class="card-body table-responsive">
@@ -22,7 +22,6 @@
             <thead>
               <tr>
                 <th>No.</th>
-                <th>Employee_Name</th>
                 <th>Leave_Type_Id</th>
                 <th>Description</th>
                 <th>Leave_From</th>
@@ -36,7 +35,6 @@
               @foreach($data as $item)
                 <tr>
                 <td>{{$loop->iteration}}</td>
-                <td>{{$item->User->name . ' ' . $item->User->last_name}}</td>
                 <td>{{$item->leavetype->leave_type}}</td>
                 <td>{{$item->description}}</td>
                 <td>{{$item->leave_from}}</td>

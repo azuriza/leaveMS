@@ -142,6 +142,7 @@ Route::prefix('manager')->middleware(['auth', 'role:2'])->group(function () {
 
   // Leave Types Routes
   Route::get('applyleave', [ApplyleaveController::class, 'indexmanager']);
+  Route::get('applyleaveself', [ApplyleaveController::class, 'indexmanagerself']);
   Route::get('add/applyleave', [ApplyleaveController::class, '_createmanager']);// contructed create for manager
   Route::post('add/applyleave', [ApplyleaveController::class, 'registermanager']);// store in manager contsructed
   Route::get('edit/applyleave/{id}', [ApplyleaveController::class, 'editmanager']);

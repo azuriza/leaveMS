@@ -108,13 +108,21 @@ class ApplyleaveController extends Controller
     }
     
     //implementation manager
+    public function indexmanagerself()
+    {
+        $user_id = Auth::user()->id;
+        $data = Applyleave::where('user_id', $user_id)->get();
+        return view('manager.Applyleave.indexself', compact('data'));
+    }
+
     public function indexmanager()
     {
         //$user_id = Auth::user()->id;
         $dep = Auth::user()->department_id;
         $data = Applyleave::whereHas('User', function($query) use ($dep) {
-            $query->where('department_id', $dep);
-        })->with(['User.department'])->get();
+            $query->where('department_id', $dep)->where('role_as', 0);
+        })->with(['User.department'])
+        ->get();
         //$data = Applyleave::all();
         return view('manager.Applyleave.index', compact('data'));
     }
@@ -148,7 +156,7 @@ class ApplyleaveController extends Controller
             'handover_id_3' => 'nullable',
             'leave_days' => 'required',
             'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'reason' => 'required'
+            'reason' => 'nullable'
         ]);
 
         $user = auth()->user();
@@ -171,10 +179,14 @@ class ApplyleaveController extends Controller
         $data->description = $request->input('description');
         $data->leave_from = $request->input('leave_from');
         $data->leave_to = $request->input('leave_to');
+        $data->handover_id = $request->input('handover_id');
         $data->handover_id_2 = $request->input('handover_id_2');
         $data->handover_id_3 = $request->input('handover_id_3');
         $data->leave_days = $request->input('leave_days');
-        $data->file_path = $path;
+        if ($request->hasFile('file_path')) {
+            $path = $request->file('file_path')->store('dokumencuti', 'public');
+            $data->file_path = $path; // jika ingin disimpan ke database
+        }
         $data->reason = $request->input('reason');
         $data->save();
 
@@ -193,15 +205,16 @@ class ApplyleaveController extends Controller
             }
         }
 
-        return redirect('manager/applyleave')->with(['status' => 'Leave Applied Successfully', 'status_code' => 'success']);
+        return redirect('manager/applyleaveself')->with(['status' => 'Leave Applied Successfully', 'status_code' => 'success']);
     }    
 
     public function editmanager($id)
     {
         $users = User::all();
         $data = Applyleave::find($id);
+        $isOwnData = $data->user_id == Auth::user()->id;
         
-        return view('manager.Applyleave.edit', compact('data','users'));
+        return view('manager.Applyleave.edit', compact('data','users','isOwnData'));
     }  
 
     public function updatemanager(Request $request, $id)
@@ -216,7 +229,7 @@ class ApplyleaveController extends Controller
             'handover_id_3' => 'nullable',
             'leave_days' => 'required',
             'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'reason' => 'required'
+            'reason' => 'nullable'
         ]);
 
         if ($validator->fails())
@@ -303,7 +316,12 @@ class ApplyleaveController extends Controller
                     }  
                 }            
 
-                return redirect('manager/applyleave')->with(['status' => 'Updated Successfully', 'status_code' => 'success']);
+                if ($data->user_id === $user) {
+                    return redirect('manager/applyleaveself')->with(['status' => 'Updated Successfully', 'status_code' => 'success']);
+                } else {
+                    return redirect('manager/applyleave')->with(['status' => 'Updated Successfully', 'status_code' => 'success']);  
+                }
+                
             }
             else
             {
@@ -372,8 +390,6 @@ class ApplyleaveController extends Controller
             }
         }
 
-        $path = $request->file('file_path')->store('dokumencuti', 'public');
-
         $data = new Applyleave;
         $data->user_id = $request->input('user_id');
         $data->leave_type_id = $request->input('leave_type_id');
@@ -384,7 +400,10 @@ class ApplyleaveController extends Controller
         $data->handover_id_2 = $request->input('handover_id_2');
         $data->handover_id_3 = $request->input('handover_id_3');
         $data->leave_days = $request->input('leave_days');
-        $data->file_path = $path;
+        if ($request->hasFile('file_path')) {
+            $path = $request->file('file_path')->store('dokumencuti', 'public');
+            $data->file_path = $path; // jika ingin disimpan ke database
+        }
         $data->reason = $request->input('reason');
         $data->save();
 

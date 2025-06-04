@@ -28,7 +28,7 @@
                             </ul>
                         </div>
                     @endif
-                    <form action="{{ url('manager/add/applyleave') }}" method="POST">
+                    <form action="{{ url('manager/add/applyleave') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row col-md-12 col-lg-12 col-xl-12">
                             

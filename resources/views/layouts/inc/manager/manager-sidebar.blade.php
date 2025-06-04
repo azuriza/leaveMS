@@ -26,18 +26,20 @@
                     </nav>
                 </div> -->
 
-                <a class="nav-link collapsed {{ request()->is('manager/applyleave') || request()->is('manager/add/applyleave') ? 'active' : '' }}"
+                <a class="nav-link collapsed {{ request()->is('manager/applyleave') || request()->is('manager/applyleaveself') || request()->is('manager/add/applyleave') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="false"
                     aria-controls="collapseLayouts">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                     Applied Leave
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->is('manager/applyleave') || request()->is('manager/add/applyleave') ? 'show' : '' }}"
+                <div class="collapse {{ request()->is('manager/applyleave') || request()->is('manager/applyleaveself') || request()->is('manager/add/applyleave') ? 'show' : '' }}"
                     id="collapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {{ request()->is('manager/applyleaveself') ? 'active' : '' }}"
+                            href="{{ url('manager/applyleaveself')}}">View My Leaves</a>
                         <a class="nav-link {{ request()->is('manager/applyleave') ? 'active' : '' }}"
-                            href="{{ url('manager/applyleave')}}">View Leaves</a>
+                            href="{{ url('manager/applyleave')}}">View Employee Leaves</a>
                         <a class="nav-link {{ request()->is('manager/add/applyleave') ? 'active' : '' }}"
                             href="{{ url('manager/add/applyleave')}}">Apply Leave</a>
                     </nav>

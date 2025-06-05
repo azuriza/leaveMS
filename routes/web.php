@@ -31,6 +31,14 @@ Route::post('add/applyleave', [ApplyleaveController::class, 'store']);
 Route::get('show/applyleave', [ApplyleaveController::class, 'show']);
 Route::get('edit/applyleave/{id}', [ApplyleaveController::class, '_edit']);
 Route::put('update/applyleave/{id}', [ApplyleaveController::class, '_update']);
+Route::get('edit/applyleave/{id}', [ApplyleaveController::class, '_edit']);
+Route::put('update/applyleave/{id}', [ApplyleaveController::class, '_update']);
+
+Route::get('showho/applyleave', [ApplyleaveController::class, 'showho']);
+Route::post('applyleave/accept/{id}', [ApplyleaveController::class, 'accept']);
+Route::post('applyleave/reject/{id}', [ApplyleaveController::class, 'reject']);
+
+
 Route::get('show/dokumen', [DokumenController::class, 'show']);
 Route::get('/dashboard', [DashboardController::class, 'dashemployee']);
 

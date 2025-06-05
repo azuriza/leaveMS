@@ -93,62 +93,120 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="form-group col-6 mb-3" id="handover_container">
-                            <label for="handover_id">Select User to Hand Over:</label>
-                            <select id="handover_id" class="form-control @error('handover_id') is-invalid @enderror"
-                                name="handover_id" autocomplete="handover_id" autofocus>
-                                @if($users)
-                                    @foreach($users as $person)
-                                        <option value="{{ $person->id }}" 
-                                            {{ (old('handover_id') ?? ($data->handover_id ?? Auth::user()->id)) == $person->id ? 'selected' : '' }}>
-                                            {{ $person->name . ' ' . $person->last_name }}
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
-                            @error('handover_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="form-group col-6 mb-3" id="handover2_container">
-                            <label for="handover_id_2">Select User to Hand Over 2 (Optional):</label>
-                            <select id="handover_id_2" class="form-control @error('handover_id_2') is-invalid @enderror"
-                                name="handover_id_2" autocomplete="handover_id_2" autofocus>
-                                
-                                <option value="">-- Pilih User --</option> {{-- opsi kosong --}}
+                        <div class="row align-items-end">
+                            <div class="form-group col-6 mb-3" id="handover_container">
+                                <label for="handover_id">Select User to Hand Over:</label>
+                                <select id="handover_id" class="form-control @error('handover_id') is-invalid @enderror"
+                                    name="handover_id" autocomplete="handover_id" autofocus>
+                                    @if($users)
+                                        @foreach($users as $person)
+                                            <option value="{{ $person->id }}" 
+                                                {{ (old('handover_id') ?? ($data->handover_id ?? Auth::user()->id)) == $person->id ? 'selected' : '' }}>
+                                                {{ $person->name . ' ' . $person->last_name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('handover_id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <!-- Update Status -->
+                            <div class="form-group col-4 mb-3" id="handover_status_container">
+                                <label for="handover_status">{{ __('Hand Over Status:') }}</label>
+                                <input type="text" class="form-control" value="@php
+                                    $status = (int) $data->handover_status;
+                                    echo match($status) {
+                                        1 => 'Accepted',
+                                        2 => 'Rejected',
+                                        default => 'Pending'
+                                    };
+                                @endphp" readonly>
+                                {{-- input hidden untuk dikirim ke server --}}
+                                <input type="hidden" name="handover_status" id="hidden_handover_status" value="{{ $data->handover_status }}">
 
-                                @if($users)
-                                    @foreach($users as $person)
-                                        <option value="{{ $person->id }}" 
-                                            {{ (old('handover_id_2') ?? $data->handover_id_2) == $person->id ? 'selected' : '' }}>
-                                            {{ $person->name . ' ' . $person->last_name }}
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
-                            @error('handover_id_2')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                                @error('handover_status')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                        <div class="form-group col-6 mb-3" id="handover3_container">
-                            <label for="handover_id_3">Select User to Hand Over 3 (Optional):</label>
-                            <select id="handover_id_3" class="form-control @error('handover_id_3') is-invalid @enderror"
-                                name="handover_id_3" autocomplete="handover_id_3" autofocus>
-                                
-                                <option value="">-- Pilih User --</option> {{-- opsi kosong --}}
+                        <div class="row align-items-end">
+                            <div class="form-group col-6 mb-3" id="handover2_container">
+                                <label for="handover_id_2">Select User to Hand Over 2 (Optional):</label>
+                                <select id="handover_id_2" class="form-control @error('handover_id_2') is-invalid @enderror"
+                                    name="handover_id_2" autocomplete="handover_id_2" autofocus>
+                                    
+                                    <option value="">-- Pilih User --</option> {{-- opsi kosong --}}
 
-                                @if($users)
-                                    @foreach($users as $person)
-                                        <option value="{{ $person->id }}" 
-                                            {{ (old('handover_id_3') ?? $data->handover_id_3) == $person->id ? 'selected' : '' }}>
-                                            {{ $person->name . ' ' . $person->last_name }}
-                                        </option>
-                                    @endforeach
-                                @endif
-                            </select>
-                            @error('handover_id_3')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                                    @if($users)
+                                        @foreach($users as $person)
+                                            <option value="{{ $person->id }}" 
+                                                {{ (old('handover_id_2') ?? $data->handover_id_2) == $person->id ? 'selected' : '' }}>
+                                                {{ $person->name . ' ' . $person->last_name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('handover_id_2')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group col-4 mb-3" id="handover2_status_container">
+                                <label for="handover2_status">{{ __('Hand Over 2 Status:') }}</label>
+                                <input type="text" class="form-control" value="@php
+                                    $status = (int) $data->handover2_status;
+                                    echo match($status) {
+                                        1 => 'Accepted',
+                                        2 => 'Rejected',
+                                        default => 'Pending'
+                                    };
+                                @endphp" readonly>
+                                {{-- input hidden untuk dikirim ke server --}}
+                                <input type="hidden" name="handover2_status" id="hidden_handover2_status" value="{{ $data->handover2_status }}">
+
+                                @error('handover2_status')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row align-items-end">
+                            <div class="form-group col-6 mb-3" id="handover3_container">
+                                <label for="handover_id_3">Select User to Hand Over 3 (Optional):</label>
+                                <select id="handover_id_3" class="form-control @error('handover_id_3') is-invalid @enderror"
+                                    name="handover_id_3" autocomplete="handover_id_3" autofocus>
+                                    
+                                    <option value="">-- Pilih User --</option> {{-- opsi kosong --}}
+
+                                    @if($users)
+                                        @foreach($users as $person)
+                                            <option value="{{ $person->id }}" 
+                                                {{ (old('handover_id_3') ?? $data->handover_id_3) == $person->id ? 'selected' : '' }}>
+                                                {{ $person->name . ' ' . $person->last_name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('handover_id_3')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group col-4 mb-3" id="handover3_status_container">
+                                <label for="handover3_status">{{ __('Hand Over 3 Status:') }}</label>
+                                <input type="text" class="form-control" value="@php
+                                    $status = (int) $data->handover3_status;
+                                    echo match($status) {
+                                        1 => 'Accepted',
+                                        2 => 'Rejected',
+                                        default => 'Pending'
+                                    };
+                                @endphp" readonly>
+                                {{-- input hidden untuk dikirim ke server --}}
+                                <input type="hidden" name="handover3_status" id="hidden_handover3_status" value="{{ $data->handover3_status }}">
+
+                                @error('handover3_status')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
                         <!-- <div class="form-group mb-3">
                             <label for="handover_id">Select User to Hand Over:</label>

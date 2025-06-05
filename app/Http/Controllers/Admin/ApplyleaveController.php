@@ -372,8 +372,7 @@ class ApplyleaveController extends Controller
             'handover_id_2' => 'nullable',
             'handover_id_3' => 'nullable',
             'leave_days' => 'required',
-            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'reason' => 'required'
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048'
         ]);
 
         $user = auth()->user();
@@ -404,7 +403,6 @@ class ApplyleaveController extends Controller
             $path = $request->file('file_path')->store('dokumencuti', 'public');
             $data->file_path = $path; // jika ingin disimpan ke database
         }
-        $data->reason = $request->input('reason');
         $data->save();
 
         if ($leavetype !== '8' && $leavetype !== '9') {
@@ -430,6 +428,64 @@ class ApplyleaveController extends Controller
     {
         $data = Applyleave::all();
         return view('Pages.Applyleave.show', compact('data'));
+    }
+
+    public function showho()
+    {
+        $userId = Auth::id();
+        $data = \App\Models\Applyleave::select('*')
+            ->selectRaw("CASE
+                WHEN handover_id = $userId and handover_status = 1 THEN 1
+                WHEN handover_id = $userId and handover_status = 2 THEN 2
+                WHEN handover_id_2 = $userId and handover2_status = 1 THEN 1
+                WHEN handover_id_2 = $userId and handover2_status = 2 THEN 2
+                WHEN handover_id_3 = $userId and handover3_status = 1 THEN 1
+                WHEN handover_id_3 = $userId and handover3_status = 2 THEN 2
+                ELSE 0
+            END as handover_match", [$userId, $userId, $userId])
+            ->where(function ($q) use ($userId) {
+                $q->where('handover_id', $userId)
+                ->orWhere('handover_id_2', $userId)
+                ->orWhere('handover_id_3', $userId);
+            })
+            ->with('User') // relasi user tetap ikut dimuat
+            ->get();
+        return view('Pages.Applyleave.showho', compact('data'));
+    }
+
+    public function accept($id)
+    {
+        $leave = Applyleave::findOrFail($id);
+
+        // Tandai status sebagai diterima oleh yang sedang login
+        if (Auth::id() == $leave->handover_id) {
+            $leave->handover_status = 1;
+        } elseif (Auth::id() == $leave->handover_id_2) {
+            $leave->handover2_status = 1;
+        } elseif (Auth::id() == $leave->handover_id_3) {
+            $leave->handover3_status = 1;
+        }
+
+        $leave->save();
+
+        return redirect()->back()->with('success', 'Hand Over accepted.');
+    }
+
+    public function reject($id)
+    {
+        $leave = Applyleave::findOrFail($id);
+
+        if (Auth::id() == $leave->handover_id) {
+            $leave->handover_status = 2;
+        } elseif (Auth::id() == $leave->handover_id_2) {
+            $leave->handover2_status = 2;
+        } elseif (Auth::id() == $leave->handover_id_3) {
+            $leave->handover3_status = 2;
+        }
+
+        $leave->save();
+
+        return redirect()->back()->with('error', 'Hand Over rejected.');
     }
     
     public function _edit($id)// Frontend
@@ -457,8 +513,7 @@ class ApplyleaveController extends Controller
             'handover_id_2' => 'nullable',
             'handover_id_3' => 'nullable',
             'leave_days' => 'required',
-            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'reason' => 'required'
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048'
         ]);
         
         if ($validator->fails()) {
@@ -512,7 +567,6 @@ class ApplyleaveController extends Controller
                     $path = $request->file('file_path')->store('dokumencuti', 'public');
                     $data->file_path = $path;
                 }
-                $data->reason = $request->input('reason');
                 $data->update(); 
                 
                 if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate            

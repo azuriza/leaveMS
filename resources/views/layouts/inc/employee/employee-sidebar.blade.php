@@ -15,10 +15,11 @@
                     Applied Leave
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->is('add/applyleave') || request()->is('show/applyleave') ? 'show' : '' }}" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                <div class="collapse {{ request()->is('add/applyleave') || request()->is('show/applyleave') || request()->is('showho/applyleave') ? 'show' : '' }}" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ request()->is('add/applyleave') ? 'active' : '' }}" href="{{ url('add/applyleave')}}">Apply Leave</a>
                         <a class="nav-link {{ request()->is('show/applyleave') ? 'active' : '' }}" href="{{ url('show/applyleave')}}">View Leaves</a>
+                        <a class="nav-link {{ request()->is('showho/applyleave') ? 'active' : '' }}" href="{{ url('showho/applyleave')}}">View HandOver</a>
                     </nav>
                 </div>
                 <a class="nav-link collapsed {{ request()->is('show/dokumen') ? 'active' : '' }}" href="#" data-bs-toggle="collapse" data-bs-target="#dokumens" aria-expanded="false" aria-controls="collapseLayouts">

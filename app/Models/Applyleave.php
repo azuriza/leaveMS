@@ -42,8 +42,7 @@ class Applyleave extends Model
         'leave_from',
         'leave_to',
         'status',
-        'handover_id'
-        
+        'handover_id'        
     ];
   
 }

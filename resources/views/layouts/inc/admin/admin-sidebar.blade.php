@@ -90,6 +90,20 @@
                             href="{{ url('admin/add/dokumen')}}">Add Documents</a>
                     </nav>
                 </div>
+                <a class="nav-link collapsed {{ request()->is('admin/laporanleave') ? 'active' : '' }}"
+                    href="#" data-bs-toggle="collapse" data-bs-target="#laporanleave" aria-expanded="false"
+                    aria-controls="laporanleave">
+                    <div class="sb-nav-link-icon"><i class="fa fa-user fa-fw"></i></div>
+                    Leave Report
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse {{ request()->is('admin/laporanleave') ? 'show' : '' }}"
+                    id="laporanleave" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {{ request()->is('admin/laporanleave') ? 'active' : '' }}"
+                            href="{{ url('admin/laporanleave')}}">View Leave Report</a>
+                    </nav>
+                </div>
                 <a class="nav-link collapsed {{ request()->is('admin/users') || request()->is('admin/add/user') ? 'active' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#users" aria-expanded="false"
                     aria-controls="users">

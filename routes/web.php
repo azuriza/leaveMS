@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\LeavetypeController;
 use App\Http\Controllers\Admin\ApplyleaveController;
 use App\Http\Controllers\Admin\DokumenController;
 use App\Http\Controllers\Admin\KategoriDokumenController;
+use App\Http\Controllers\Admin\LaporanController;
 
 Route::get('/api/hitung-hari-kerja', function (\Illuminate\Http\Request $request) {
     $from = $request->query('from');
@@ -127,6 +128,9 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
   Route::get('edit/kategori/{id}', [KategoriDokumenController::class, 'editadmin']);
   Route::put('update/kategori/{id}', [KategoriDokumenController::class, 'updateadmin']);
   Route::delete('delete/kategori/{id}', [KategoriDokumenController::class, 'deleteadmin']);
+
+  Route::get('laporanleave', [LaporanController::class, 'indexleave']);
+  Route::get('cetak/laporanleave', [LaporanController::class, 'cetakPDFleave']);
 });
 
 Route::prefix('manager')->middleware(['auth', 'role:2'])->group(function () {

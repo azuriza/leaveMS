@@ -435,21 +435,24 @@ class ApplyleaveController extends Controller
         $userId = Auth::id();
         $data = \App\Models\Applyleave::select('*')
             ->selectRaw("CASE
-                WHEN handover_id = $userId and handover_status = 1 THEN 1
-                WHEN handover_id = $userId and handover_status = 2 THEN 2
-                WHEN handover_id_2 = $userId and handover2_status = 1 THEN 1
-                WHEN handover_id_2 = $userId and handover2_status = 2 THEN 2
-                WHEN handover_id_3 = $userId and handover3_status = 1 THEN 1
-                WHEN handover_id_3 = $userId and handover3_status = 2 THEN 2
+                WHEN handover_id = ? and handover_status = 1 THEN 1
+                WHEN handover_id = ? and handover_status = 2 THEN 2
+                WHEN handover_id_2 = ? and handover2_status = 1 THEN 1
+                WHEN handover_id_2 = ? and handover2_status = 2 THEN 2
+                WHEN handover_id_3 = ? and handover3_status = 1 THEN 1
+                WHEN handover_id_3 = ? and handover3_status = 2 THEN 2
                 ELSE 0
-            END as handover_match", [$userId, $userId, $userId])
+            END as handover_match", [
+                $userId, $userId, $userId, $userId, $userId, $userId
+            ])
             ->where(function ($q) use ($userId) {
                 $q->where('handover_id', $userId)
                 ->orWhere('handover_id_2', $userId)
                 ->orWhere('handover_id_3', $userId);
             })
-            ->with('User') // relasi user tetap ikut dimuat
+            ->with('User')
             ->get();
+
         return view('Pages.Applyleave.showho', compact('data'));
     }
 

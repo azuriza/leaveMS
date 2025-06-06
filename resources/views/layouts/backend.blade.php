@@ -82,6 +82,7 @@
         </div>
     </div>
 
+    <!-- JQUERY harus dimuat dulu -->
     <script src="{{asset('backend/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{asset('backend/js/scripts.js')}}"></script>
     <script src="{{asset('backend/js/jquery-3.6.0.min.js')}}"></script>

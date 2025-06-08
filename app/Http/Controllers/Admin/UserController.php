@@ -65,7 +65,7 @@ class UserController extends Controller
   //Create admin user  
   public function index()
   {
-    $users = User::where('department_id', auth()->user()->department_id)->get();
+    $users = User::all();
     return view('admin.user.index', ['users' => $users]);
   }
   
@@ -150,6 +150,96 @@ class UserController extends Controller
     $user = User::find($user_id);
     $user->delete();
     return redirect('admin/users')->with(['status' => 'User Deleted Successfully', 'status_code' => 'success']);
+  }
+
+  //Create adminhr user  
+  public function indexadminhr()
+  {
+    $users = User::where('role_as', '!=', 1)->get();
+    return view('adminhr.user.index', ['users' => $users]);
+  }
+  
+  public function createadminhr()
+  {
+    $departments = Department::all();
+    $users = User::all();
+    return view('adminhr.user.create', ['departments' => $departments, 'users' => $users]);
+  }
+  public function storeadminhr(Request $request)
+  {
+    $request->validate([
+      'employeeid' => ['required', 'string', 'max:6'],
+      'name' => ['required', 'string', 'max:255'],
+      'last_name' => ['required', 'string', 'max:255'],
+      'gender' => ['required', 'string', 'max:50'],
+      'phone' => ['required', 'string', 'max:12'],
+      'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+      'department_id' => ['required', 'integer'],
+      'password' => ['required', 'string', 'min:8', 'confirmed'],
+    ]);
+
+    $user = new User;
+    $user->employeeid = $request->input('employeeid');
+    $user->name = $request->input('name');
+    $user->last_name = $request->input('last_name');
+    $user->gender = $request->input('gender');
+    $user->phone = $request->input('phone');
+    $user->email = $request->input('email');
+    $user->department_id = $request->input('department_id');
+    $user->password = Hash::make($request->input('password'));
+    $user->save();
+
+    return redirect('adminhr/add/user')->with(['status' => 'User Added Successfully', 'status_code' => 'success']);
+  }
+
+  public function editadminhr($user_id)
+  {
+    $user = User::find($user_id);
+    return view('adminhr.user.edit', compact('user'));
+  }
+
+  public function updateadminhr(Request $request, $user_id)
+  {
+    $request->validate([
+        'employeeid' => ['required', 'string', 'max:6'],
+        'name' => ['required', 'string', 'max:255'],
+        'last_name' => ['required', 'string', 'max:255'],
+        'gender' => ['required', 'string', 'max:50'],
+        'phone' => ['required', 'string', 'max:12'],
+        'email' => ['required', 'string', 'email', 'max:255'],
+        'role_as' => ['required', 'integer'],
+        'password' => ['nullable', 'string', 'min:8'],
+    ]);
+
+    $user = User::find($user_id);
+    if ($user) {
+        // Update user attributes
+        $user->employeeid = $request->input('employeeid');
+        $user->name = $request->input('name');
+        $user->last_name = $request->input('last_name');
+        $user->gender = $request->input('gender');
+        $user->phone = $request->input('phone');
+        $user->email = $request->input('email');
+        $user->role_as = $request->input('role_as');
+
+        // Only update the password if a new one is provided
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->input('password'));
+        }
+
+        $user->update();
+
+        return redirect('adminhr/users')->with(['status' => 'User Updated Successfully', 'status_code' => 'success']);
+    } else {
+        return redirect('adminhr/users')->with(['status' => 'No User Found', 'status_code' => 'error']);
+    }
+  }
+
+  public function destroyadminhr($user_id)
+  {
+    $user = User::find($user_id);
+    $user->delete();
+    return redirect('adminhr/users')->with(['status' => 'User Deleted Successfully', 'status_code' => 'success']);
   }
 
   //Create manager user  

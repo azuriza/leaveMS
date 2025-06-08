@@ -133,6 +133,38 @@ Route::prefix('admin')->middleware(['auth', 'role:1'])->group(function () {
   Route::get('cetak/laporanleave', [LaporanController::class, 'cetakPDFleave']);
 });
 
+Route::prefix('direktur')->middleware(['auth', 'role:3'])->group(function () {
+  Route::get('/dashboard', [DashboardController::class, 'dashdirektur'])->name('direktur/dashboard');  
+
+  Route::get('applyleave', [ApplyleaveController::class, 'indexdirektur']);
+  Route::get('applyleaveself', [ApplyleaveController::class, 'indexdirekturself']);
+  Route::get('add/applyleave', [ApplyleaveController::class, '_createdirektur']);// contructed create for direktur
+  Route::post('add/applyleave', [ApplyleaveController::class, 'registerdirektur']);// store in direktur contsructed
+  Route::get('edit/applyleave/{id}', [ApplyleaveController::class, 'editdirektur']);
+  Route::put('update/applyleave/{id}', [ApplyleaveController::class, 'updatedirektur']);
+  Route::delete('delete/applyleave/{id}', [ApplyleaveController::class, 'deletedirektur']);
+});  
+
+Route::prefix('adminhr')->middleware(['auth', 'role:4'])->group(function () {
+  Route::get('users', [UserController::class, 'indexadminhr']);
+  Route::get('add/user', [UserController::class, 'createadminhr']);
+  Route::post('add/user', [UserController::class, 'storeadminhr']);
+  Route::get('user/{user_id}/edit', [UserController::class, 'editadminhr']);
+  Route::put('update_user/{user_id}', [UserController::class, 'updateadminhr']);
+  Route::delete('delete/user/{user_id}',[UserController::class,'destroyadminhr']);
+
+  Route::get('/dashboard', [DashboardController::class, 'dashadminhr'])->name('adminhr/dashboard');
+  Route::get('applyleave', [ApplyleaveController::class, 'indexadminhr']);
+  Route::get('applyleaveself', [ApplyleaveController::class, 'indexadminhrself']);
+  Route::get('add/applyleave', [ApplyleaveController::class, '_createadminhr']);// contructed create for adminhr
+  Route::post('add/applyleave', [ApplyleaveController::class, 'registeradminhr']);// store in adminhr contsructed
+  Route::get('edit/applyleave/{id}', [ApplyleaveController::class, 'editadminhr']);
+  Route::put('update/applyleave/{id}', [ApplyleaveController::class, 'updateadminhr']);
+
+  Route::get('laporanleave', [LaporanController::class, 'indexleaveadminhr']);
+  Route::get('cetak/laporanleave', [LaporanController::class, 'cetakPDFleaveadminhr']);
+});
+
 Route::prefix('manager')->middleware(['auth', 'role:2'])->group(function () {
   Route::get('/dashboard', [DashboardController::class, 'dashmanager'])->name('manager/dashboard');
 

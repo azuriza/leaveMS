@@ -241,6 +241,9 @@
         const handover_container = document.getElementById("handover_container");
         const handover2_container = document.getElementById("handover2_container");
         const handover3_container = document.getElementById("handover3_container");
+        const handover_status_container = document.getElementById("handover_status_container");
+        const handover2_status_container = document.getElementById("handover2_status_container");
+        const handover3_status_container = document.getElementById("handover3_status_container");
 
         function toggleDocumentContainer() {
             if (leaveType && documentContainer) {
@@ -250,11 +253,17 @@
                     handover_container.style.display = "none";
                     handover2_container.style.display = "none";
                     handover3_container.style.display = "none";
+                    handover_status_container.style.display = "none";
+                    handover2_status_container.style.display = "none";
+                    handover3_status_container.style.display = "none";
                 } else {
                     documentContainer.style.display = "none";
                     handover_container.style.display = "block";
                     handover2_container.style.display = "block";
                     handover3_container.style.display = "block";
+                    handover_status_container.style.display = "block";
+                    handover2_status_container.style.display = "block";
+                    handover3_status_container.style.display = "block";
                 }
             }
         }

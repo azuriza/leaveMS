@@ -120,7 +120,6 @@
                             href="{{ url('admin/add/user')}}">Add User</a>
                     </nav>
                 </div>
-
             </div>
         </div>
         <div class="sb-sidenav-footer">

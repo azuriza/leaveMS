@@ -1,4 +1,4 @@
-@extends('layouts.manager')
+@extends('layouts.adminhr')
 @section('title', 'Edit Leave')
 @section('content')
 
@@ -15,12 +15,12 @@
                 <div class="card-header">
                     <h4>Approve or Reject Leave
                         @if ($isOwnData)
-                        <a href="{{ url('manager/applyleaveself') }}" class="btn btn-info btn-sm float-end rounded">
+                        <a href="{{ url('adminhr/applyleaveself') }}" class="btn btn-info btn-sm float-end rounded">
                             <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Back
                         </a>
                         @endif
                         @if (!$isOwnData)
-                        <a href="{{ url('manager/applyleave') }}" class="btn btn-info btn-sm float-end rounded">
+                        <a href="{{ url('adminhr/applyleave') }}" class="btn btn-info btn-sm float-end rounded">
                             <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Back
                         </a>
                         @endif
@@ -36,7 +36,7 @@
                             </ul>
                         </div>
                     @endif
-                    <form action="{{ url('manager/update/applyleave/' . $data->id) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ url('adminhr/update/applyleave/' . $data->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -231,7 +231,6 @@
         const documentContainer = document.getElementById("document_container");
         const documentContainer2 = document.getElementById("document2_container");
         const reasonContainer = document.getElementById("reason_container");
-        const reasontext = document.getElementById("reason");
         const handover_container = document.getElementById("handover_container");
         const handover2_container = document.getElementById("handover2_container");
         const handover3_container = document.getElementById("handover3_container"); 
@@ -253,7 +252,7 @@
                         handover_container.style.display = "none";
                         handover2_container.style.display = "none";
                         handover3_container.style.display = "none";
-                        statusSelect.disabled = true;
+                        statusSelect.disabled = false;
                     } else {
                         documentContainer.style.display = "none";
                         documentContainer2.style.display = "none";
@@ -261,7 +260,7 @@
                         handover2_container.style.display = "block";
                         handover3_container.style.display = "block";
                         statusContainer.style.display = "block";
-                        statusSelect.disabled = false;
+                        statusSelect.disabled = true;
                     }
                     //reasonContainer.style.display = "block";                    
                 } else {// jika edit self
@@ -278,9 +277,10 @@
                         handover2_container.style.display = "none";
                         handover3_container.style.display = "none";
                     }
+                    
                     if (hiddenStatus !== 0){
                         reasonContainer.style.display = "block";
-                        reasontext.readOnly = true;   
+                        reasonContainer.readonly = true;   
                     } else {
                         reasonContainer.style.display = "none";
                     }

@@ -1,4 +1,4 @@
-@extends('layouts.manager')
+@extends('layouts.direktur')
 @section('title', 'Edit Leave')
 @section('content')
 
@@ -15,12 +15,12 @@
                 <div class="card-header">
                     <h4>Approve or Reject Leave
                         @if ($isOwnData)
-                        <a href="{{ url('manager/applyleaveself') }}" class="btn btn-info btn-sm float-end rounded">
+                        <a href="{{ url('direktur/applyleaveself') }}" class="btn btn-info btn-sm float-end rounded">
                             <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Back
                         </a>
                         @endif
                         @if (!$isOwnData)
-                        <a href="{{ url('manager/applyleave') }}" class="btn btn-info btn-sm float-end rounded">
+                        <a href="{{ url('direktur/applyleave') }}" class="btn btn-info btn-sm float-end rounded">
                             <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Back
                         </a>
                         @endif
@@ -36,7 +36,7 @@
                             </ul>
                         </div>
                     @endif
-                    <form action="{{ url('manager/update/applyleave/' . $data->id) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ url('direktur/update/applyleave/' . $data->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 

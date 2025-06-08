@@ -29,6 +29,10 @@ class HomeController extends Controller
           return redirect('admin/dashboard')->with(['status' => 'Already logged in', 'status_code' => 'success']);
         } else if ($user->role_as == '2') {
           return redirect('manager/dashboard')->with(['status' => 'Already logged in', 'status_code' => 'success']);
+        } else if ($user->role_as == '3') {
+          return redirect('direktur/dashboard')->with(['status' => 'Already logged in', 'status_code' => 'success']);
+        } else if ($user->role_as == '4') {
+          return redirect('adminhr/dashboard')->with(['status' => 'Already logged in', 'status_code' => 'success']);
         } else if ($user->role_as == '5') {
           return redirect('adminiso/dashboard')->with(['status' => 'Already logged in', 'status_code' => 'success']);
         } else if ($user->role_as == '0') {
@@ -51,6 +55,10 @@ class HomeController extends Controller
         return redirect('admin/dashboard');
       } else if ($user->role_as == '2') {
         return redirect('manager/dashboard');
+      } else if ($user->role_as == '3') {
+        return redirect('direktur/dashboard');
+      } else if ($user->role_as == '4') {
+        return redirect('adminhr/dashboard');
       } else if ($user->role_as == '5') {
         return redirect('adminiso/dashboard');
       } else if ($user->role_as == '0') {

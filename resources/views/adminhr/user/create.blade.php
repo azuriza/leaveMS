@@ -149,7 +149,6 @@
                             <div class="col-md-4 mb-3">
                                 <label for="password">Password:</label>
                                 <input
-                                    v-model="user.password"
                                     type="password"
                                     id="password"
                                     class="form-control @error('password') is-invalid @enderror"
@@ -164,12 +163,11 @@
                             <div class="col-md-4 mb-3">
                                 <label for="password_confirmation">Confirm Password:</label>
                                 <input
-                                    v-model="user.password_confirmation"
                                     type="password"
                                     id="password_confirmation"
-                                    class="form-control"
+                                    class="form-control @error('password_confirmation') is-invalid @enderror"
                                     name="password_confirmation"
-                                    autocomplete="new-password"
+                                    autocomplete="new-password-confirmation"
                                 />
                             </div>
                             <div class="col-lg-12 col-xl-12 col-md-12 mb-3">

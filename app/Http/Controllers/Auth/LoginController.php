@@ -35,6 +35,10 @@ class LoginController extends Controller
             return redirect('admin/dashboard')->with(['status' => ' Welcome to Admin Dashboard', 'status_code' => 'success']);
         } else if (Auth::user()->role_as == '2') {
             return redirect('manager/dashboard')->with(['status' => ' Welcome to Manager Dashboard', 'status_code' => 'success']);
+        } else if (Auth::user()->role_as == '3') {
+            return redirect('direktur/dashboard')->with(['status' => ' Welcome to Direktur Dashboard', 'status_code' => 'success']);
+        } else if (Auth::user()->role_as == '4') {
+            return redirect('adminhr/dashboard')->with(['status' => ' Welcome to Admin HR Dashboard', 'status_code' => 'success']);
         } else if (Auth::user()->role_as == '5') {
             return redirect('adminiso/dashboard')->with(['status' => ' Welcome to Admin ISO Dashboard', 'status_code' => 'success']);
         } else if (Auth::user()->role_as == '0') {

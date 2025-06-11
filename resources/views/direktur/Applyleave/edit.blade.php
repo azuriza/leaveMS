@@ -257,9 +257,9 @@
                     } else {
                         documentContainer.style.display = "none";
                         documentContainer2.style.display = "none";
-                        handover_container.style.display = "block";
-                        handover2_container.style.display = "block";
-                        handover3_container.style.display = "block";
+                        handover_container.style.display = "none";
+                        handover2_container.style.display = "none";
+                        handover3_container.style.display = "none";
                         statusContainer.style.display = "block";
                         statusSelect.disabled = false;
                     }

@@ -24,7 +24,8 @@ class CheckRole
         }
       else 
     {
-      return  redirect('/login')->with(['status'=>' Please login first!','status_code'=>'info']);
+      return abort(403, 'Unauthorized action.'); // ✅ ubah di sini
+      //return  redirect('/login')->with(['status'=>' Please login first!','status_code'=>'info']);
     }
     } 
 }

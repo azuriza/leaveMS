@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Department;
 use App\Models\LeaveBalance;
 use App\Helpers\DateHelper;
+use App\Notifications\CutiDisetujuiNotification;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -166,7 +167,7 @@ class ApplyleaveController extends Controller
                 $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
                 $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+                if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate
                     // Validasi logika sisa cuti
                     if ($sisaCuti < $request->input('leave_days')) {
                         return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
@@ -202,7 +203,7 @@ class ApplyleaveController extends Controller
                 $data->reason = $request->input('reason');
                 $data->update();
 
-                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate 
+                if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate 
                     // 4. Hitung selisih dan update leave_balances
                     $selisih = $jumlahHariBaru - $jumlahHariLama;
                     $tahun = now()->year;
@@ -296,7 +297,7 @@ class ApplyleaveController extends Controller
         $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
         $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-        if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+        if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate
             // Validasi logika sisa cuti
             if ($sisaCuti < $request->input('leave_days')) {
                 return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
@@ -320,7 +321,7 @@ class ApplyleaveController extends Controller
         $data->reason = $request->input('reason');
         $data->save();
 
-        if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+        if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate
             $jumlahHari = $request->input('leave_days'); 
 
             // 2. Update cuti_terpakai di leave_balances
@@ -388,7 +389,7 @@ class ApplyleaveController extends Controller
                 $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
                 $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+                if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate
                     // Validasi logika sisa cuti
                     if ($sisaCuti < $request->input('leave_days')) {
                         return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
@@ -530,7 +531,7 @@ class ApplyleaveController extends Controller
         $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
         $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-        if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+        if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate
             // Validasi logika sisa cuti
             if ($sisaCuti < $request->input('leave_days')) {
                 return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
@@ -554,7 +555,7 @@ class ApplyleaveController extends Controller
         $data->reason = $request->input('reason');
         $data->save();
 
-        if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+        if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate
             $jumlahHari = $request->input('leave_days'); 
 
             // 2. Update cuti_terpakai di leave_balances
@@ -622,7 +623,7 @@ class ApplyleaveController extends Controller
                 $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
                 $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+                if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate
                     // Validasi logika sisa cuti
                     if ($sisaCuti < $request->input('leave_days')) {
                         return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
@@ -658,7 +659,7 @@ class ApplyleaveController extends Controller
                 $data->reason = $request->input('reason');
                 $data->update();
 
-                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate 
+                if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate 
                     // 4. Hitung selisih dan update leave_balances
                     $selisih = $jumlahHariBaru - $jumlahHariLama;
                     $tahun = now()->year;
@@ -682,7 +683,12 @@ class ApplyleaveController extends Controller
                     if ($statuslama === 2 && ($statusbaru === 1 || $statusbaru === 0)) {
                         $balance->increment('cuti_terpakai', $jumlahHariBaru);  
                     }  
-                }            
+                }       
+                
+                // Kirim notifikasi jika status berpindah ke disetujui
+                if ($statuslama !== 1 && $statusbaru == 1) {
+                    $data->user->notify(new CutiDisetujuiNotification($data));
+                }
 
                 if ($data->user_id === $userlogin) {
                     return redirect('manager/applyleaveself')->with(['status' => 'Updated Successfully', 'status_code' => 'success']);
@@ -751,7 +757,7 @@ class ApplyleaveController extends Controller
         $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
          // Validasi logika sisa cuti
-        if ($leavetype !== '8' && $leavetype !== '9') {
+        if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') {
             if ($sisaCuti < $request->input('leave_days')) {
                 return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
             }
@@ -773,7 +779,7 @@ class ApplyleaveController extends Controller
         }
         $data->save();
 
-        if ($leavetype !== '8' && $leavetype !== '9') {
+        if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') {
             //$jumlahHari = DateHelper::getWorkdays($request->input('leave_from'), $request->input('leave_to'));
             $jumlahHari = $request->input('leave_days'); 
 
@@ -907,7 +913,7 @@ class ApplyleaveController extends Controller
             $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
             $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
-            if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate
+            if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate
                 // Validasi logika sisa cuti
                 if ($sisaCuti < $request->input('leave_days')) {
                     return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
@@ -940,7 +946,7 @@ class ApplyleaveController extends Controller
                 }
                 $data->update(); 
                 
-                if ($leavetype !== '8' && $leavetype !== '9') { // Sick or Compassionate            
+                if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') { // Sick or Compassionate            
                     // 4. Hitung selisih dan update leave_balances
                     $selisih = $jumlahHariBaru - $jumlahHariLama;
                     $tahun = now()->year;

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ApplyleaveController;
 use App\Http\Controllers\Admin\DokumenController;
 use App\Http\Controllers\Admin\KategoriDokumenController;
 use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/api/hitung-hari-kerja', function (\Illuminate\Http\Request $request) {
     $from = $request->query('from');
@@ -25,6 +26,18 @@ Route::get('/api/hitung-hari-kerja', function (\Illuminate\Http\Request $request
     return response()->json(['jumlah' => 0]);
 });
 
+// Route::get('/notifications/unread', function () {
+//     return response()->json(Auth::user()->unreadNotifications);
+// })->middleware('auth');
+
+// Route::post('/notifications/mark-as-read', function () {
+//     Auth::user()->unreadNotifications->markAsRead();
+//     return response()->json(['status' => 'success']);
+// })->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications/latest', [NotificationController::class, 'latest']);
+    Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead']);
+});
 
 // Apply Leave on Frontend
 Route::get('add/applyleave', [ApplyleaveController::class, 'create']);

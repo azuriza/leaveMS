@@ -20,6 +20,17 @@
     
     <!-- Navbar Links-->
     <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+        <li class="nav-item dropdown" id="notif-wrapper">
+            <a class="nav-link position-relative" id="notificationDropdown" href="#" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell fa-lg"></i>
+                <span class="badge-notif d-none" id="notif-count">0</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-animated" aria-labelledby="notificationDropdown" id="notif-list">
+                <li><span class="dropdown-item text-muted">Loading...</span></li>
+            </ul>
+        </li>
+
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle d-flex align-items-center" id="navbarDropdown" href="#" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -54,3 +65,72 @@
         <i class="bi bi-moon"></i>
     </button> -->
 </nav>
+<script>
+    function fetchNotifications() {
+        fetch('/notifications/latest')
+            .then(response => response.json())
+            .then(data => {
+                const count = data.length;
+                const countBadge = document.getElementById('notif-count');
+                const notifList = document.getElementById('notif-list');
+
+                // Update badge
+                if (count > 0) {
+                    countBadge.textContent = count;
+                    countBadge.classList.remove('d-none');
+                } else {
+                    countBadge.classList.add('d-none');
+                }
+
+                // Tampilkan notifikasi
+                notifList.innerHTML = '';
+                if (count === 0) {
+                    notifList.innerHTML = `<li><span class="dropdown-item">Tidak ada notifikasi</span></li>`;
+                } else {
+                    data.forEach(notif => {
+                        notifList.innerHTML += `
+                            <li>
+                                <a class="dropdown-item new-notif" href="${notif.data.url ?? '#'}" data-id="${notif.id}">
+                                    ${notif.data.message ?? 'Notifikasi baru'}
+                                </a>
+                            </li>`;
+                    });
+                }
+            })
+            .catch(() => {
+                document.getElementById('notif-list').innerHTML = `
+                    <li><span class="dropdown-item text-danger">Gagal memuat notifikasi</span></li>`;
+            });
+    }
+
+    // Tandai sebagai dibaca saat klik salah satu notifikasi
+    document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('new-notif')) {
+            e.preventDefault();
+            const id = e.target.getAttribute('data-id');
+            const href = e.target.getAttribute('href');
+
+            fetch(`/notifications/mark-as-read/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            }).then(() => {
+                window.location.href = href; // redirect setelah ditandai dibaca
+            });
+        }
+    });
+
+    // Spinner awal
+    document.getElementById('notif-list').innerHTML = `
+        <li id="loading-spinner">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </li>
+    `;
+
+    fetchNotifications();
+    setInterval(fetchNotifications, 5000);
+</script>

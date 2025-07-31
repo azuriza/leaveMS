@@ -19,10 +19,15 @@ class ApplyleaveController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    { 
-        // Try this one or else uncomment the second one. This uses resource to show specific info
-            $applyleaves = new ApplyleaveCollection(Applyleave::all());
-            // $applyleaves = Applyleave::all();
+    {  
+            $user_id = Auth::user()->id;
+            $applyleaves = Applyleave::where('user_id', $user_id)->get();
+            // bungkus dengan resource collection
+            return new ApplyleaveCollection($applyleaves);
+
+       // Try this one or else uncomment the second one. This uses resource to show specific info
+            //$applyleaves = new ApplyleaveCollection(Applyleave::all());
+            //$applyleaves = Applyleave::all();            
             if ($applyleaves) {
                 return response()->json(['applyleaves' => $applyleaves], 200);
             } else {

@@ -52,21 +52,29 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string'
         ]);
-        //Check email
+
         $user = User::where('email', $data['email'])->first();
 
         if (!$user || !Hash::check($data['password'], $user->password)) {
             return response(['message' => 'Invalid Credentials'], 401);
         }
 
-        $token = $user->createToken('leaveLogin')->plainTextToken;
+        // Buat token
+        $tokenResult = $user->createToken('leaveLogin');
+        $token = $tokenResult->plainTextToken;
+
+        // Tambahkan waktu kadaluarsa (misal: 30 menit)
+        $tokenResult->accessToken->expires_at = now()->addMinutes(30);
+        $tokenResult->accessToken->save();
 
         $response = [
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'expires_at' => $tokenResult->accessToken->expires_at,
         ];
 
         return response($response, 200);
     }
+
 
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\DepartmentController;
 use App\Http\Controllers\API\LeavetypeController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,8 +16,11 @@ Route::post('login', [AuthController::class, 'login']);
 Route::get('departments', [DepartmentController::class, 'index']);
 Route::get('leavetypes', [LeavetypeController::class, 'index']);
 Route::get('products', [ProductController::class, 'index']);
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum', 'check.token.expiry'])->prefix('v1')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
+
+    Route::get('dashboard', [DashboardController::class, 'dashemployee']);
+
     // Applyleave Routes
     Route::get('leaves', [ApplyleaveController::class, 'index']);
     Route::post('leave/apply', [ApplyleaveController::class, 'store']);

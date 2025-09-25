@@ -10,6 +10,7 @@ use App\Models\Department;
 use App\Models\LeaveBalance;
 use App\Helpers\DateHelper;
 use App\Notifications\CutiDisetujuiNotification;
+use App\Notifications\CutiDiterimaManagerNotification;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -756,8 +757,22 @@ class ApplyleaveController extends Controller
         $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
         $sisaCuti = $balance ? $balance->sisa_cuti : 0;
 
+        // Validasi leave_days agar sesuai dengan tanggal
+        $leaveFrom = $request->input('leave_from');
+        $leaveTo = $request->input('leave_to');
+        $leaveDaysFromFrontend = (int) $request->input('leave_days');
+
+        // Hitung ulang jumlah hari kerja dari backend
+        $leaveDaysFromBackend = \App\Helpers\DateHelper::getWorkdays($leaveFrom, $leaveTo);
+
+        if ($leaveDaysFromFrontend !== $leaveDaysFromBackend) {
+            return back()->withErrors([
+                'msg' => "Jumlah hari cuti tidak sesuai dengan tanggal yang dipilih. Silakan refresh halaman dan coba lagi."
+            ])->withInput();
+        }
+
          // Validasi logika sisa cuti
-        if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') {
+        if (!in_array($leavetype, ['8', '9', '12'])) {
             if ($sisaCuti < $request->input('leave_days')) {
                 return back()->withErrors(['msg' => 'Sisa cuti tidak mencukupi.'])->withInput();
             }
@@ -772,28 +787,35 @@ class ApplyleaveController extends Controller
         $data->handover_id = $request->input('handover_id');
         $data->handover_id_2 = $request->input('handover_id_2');
         $data->handover_id_3 = $request->input('handover_id_3');
-        $data->leave_days = $request->input('leave_days');
+        //$data->leave_days = $request->input('leave_days');
+        $data->leave_days = $leaveDaysFromBackend;
         if ($request->hasFile('file_path')) {
-            $path = $request->file('file_path')->store('dokumencuti', 'public');
+            $path = $request->file('file_path')->storeAs(
+                'dokumencuti/' . auth()->id(),
+                now()->format('Ymd_His') . '.' . $request->file('file_path')->extension(),
+                'public'
+            );
             $data->file_path = $path; // jika ingin disimpan ke database
         }
         $data->save();
 
-        if ($leavetype !== '8' && $leavetype !== '9' && $leavetype !== '12') {
-            //$jumlahHari = DateHelper::getWorkdays($request->input('leave_from'), $request->input('leave_to'));
-            $jumlahHari = $request->input('leave_days'); 
+        if (!in_array($leavetype, ['8', '9', '12'])) {            
+            //$jumlahHari = $request->input('leave_days'); 
+            $jumlahHari = $leaveDaysFromBackend;
 
             // 2. Update cuti_terpakai di leave_balances
             $tahun = now()->year;
-            $balance = LeaveBalance::where('user_id', $request->user_id)
-                ->where('tahun', $tahun)
-                ->first();
+            $balance = $user->leaveBalances()->where('tahun', $tahunIni)->first();
 
             if ($balance) {
                 $balance->increment('cuti_terpakai', $jumlahHari);
             }
         }
 
+        // Kirim notifikasi ke manger bahwa mengajukan cuti
+        if ($data->manager) {
+            $data->manager->notify(new CutiDiterimaManagerNotification($data));
+        }
         // return redirect('add/applyleave')->with(['status' => 'Leave Applied Successfully. You have 2 days to update your application', 'status_code' => 'success']);
         return redirect('add/applyleave')->with(['status' => 'Leave Applied Successfully.', 'status_code' => 'success']);
     }

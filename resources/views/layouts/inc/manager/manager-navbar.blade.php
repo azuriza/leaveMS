@@ -66,6 +66,9 @@
     </button> -->
 </nav>
 <script>
+    // Simpan judul awal tab
+    const originalTitle = document.title;
+
     function fetchNotifications() {
         fetch('/notifications/latest')
             .then(response => response.json())
@@ -78,8 +81,10 @@
                 if (count > 0) {
                     countBadge.textContent = count;
                     countBadge.classList.remove('d-none');
+                    document.title = `(${count}) ${originalTitle}`;
                 } else {
                     countBadge.classList.add('d-none');
+                    document.title = originalTitle;
                 }
 
                 // Tampilkan notifikasi

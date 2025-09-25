@@ -30,7 +30,7 @@
                                 <label for="user_id">User:</label>
                                 <input id="user_id" type="text"
                                     class="form-control @error('user_id') is-invalid @enderror" name="user_id"
-                                    value="{{ $data->User->name . ' ' . $data->User->last_name }}"
+                                    value="{{ $data->user->name . ' ' . $data->user->last_name }}"
                                     autocomplete="user_id" readonly />
                                 @error('user_id')
                                     <span class="text-danger">{{ $message }}</span>

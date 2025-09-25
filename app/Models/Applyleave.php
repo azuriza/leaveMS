@@ -15,24 +15,35 @@ class Applyleave extends Model
     {
         return $this->belongsTo(Leavetype::class,'leave_type_id');
     }
-    public function User()
+    public function user()
     {
         return $this->belongsTo(User::class,'user_id');
     }  
-    public function Handover()
+    public function handover()
     {
         return $this->belongsTo(User::class,'handover_id');
     } 
-    public function Handover2()
+    public function handover2()
     {
         return $this->belongsTo(User::class, 'handover_id_2');
     }
 
-    public function Handover3()
+    public function handover3()
     {
         return $this->belongsTo(User::class, 'handover_id_3');
     }
 
+    public function getManagerAttribute()
+    {
+        if (!$this->user || !$this->user->department_id) {
+            return null;
+        }
+
+        return User::where('department_id', $this->user->department_id)
+                ->where('role_as', 2)
+                ->first();
+    }
+    
     protected $table ='applyleaves';
 
     protected $fillable = [

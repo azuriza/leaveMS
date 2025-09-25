@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CutiDisetujuiNotification extends Notification
+class CutiDiterimaManagerNotification extends Notification
 {
     use Queueable;
 
@@ -26,7 +26,7 @@ class CutiDisetujuiNotification extends Notification
     public function toDatabase($notifiable)
     {
         return [
-            'message' => 'Pengajuan Cuti ' . $this->cuti->leavetype->leave_type . ' oleh ' . $this->cuti->User->name . $this->cuti->User->last_name .' .',
+            'message' => 'Pengajuan Cuti ' . $this->cuti->leavetype->leave_type . ' oleh ' . $this->cuti->user->name .' '. $this->cuti->user->last_name .' .',
             'url' => url('manager/applyleave') // perhatikan: tidak ada typo!
         ];
     }

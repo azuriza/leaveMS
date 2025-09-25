@@ -17,7 +17,7 @@ class ApplyleaveResource extends JsonResource
         return [
             'id'=>$this->id,
             'status' =>$this->status,
-            'user'=>new UserResource($this->User) ,
+            'user'=>new UserResource($this->user) ,
             'leave_type_id' =>new LeavetypeResource($this->leavetype),
             'desription' =>$this->description,
             'leave_from' =>$this->leave_from,

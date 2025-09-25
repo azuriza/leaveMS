@@ -37,7 +37,7 @@
                 <tr>
                 <td>{{$loop->iteration}}</td>
                 <td>{{ $item->user->department->dpname ?? '-' }}</td>
-                <td>{{$item->User->name . ' ' . $item->User->last_name}}</td>
+                <td>{{$item->user->name . ' ' . $item->user->last_name}}</td>
                 <td>{{$item->leavetype->leave_type}}</td>
                 <td>{{$item->description}}</td>
                 <td>{{$item->leave_from}}</td>

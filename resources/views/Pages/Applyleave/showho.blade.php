@@ -33,7 +33,7 @@
               @foreach($data as $item)
             <tr>
             <!--Remember that we had r/ship btw leave and leavetype hence i pass $item->leavetype->leave_type as if i was inside leave type instead of showing $item->leave_type_id to display name instead of id <td>{{$item->user_id}}</td> -->
-            <td>{{$item->User->name . ' ' . $item->User->last_name}}</td>
+            <td>{{$item->user->name . ' ' . $item->user->last_name}}</td>
             <td>{{$item->leavetype->leave_type}}</td>
             <td>{{$item->description}}</td>
             <td>{{$item->leave_from}}</td>
